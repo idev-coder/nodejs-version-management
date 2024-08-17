@@ -29,8 +29,8 @@ export async function commands(keys: any[]) {
 
             }
         } else {
-            let status = await engineStatus()
-            process.stdout.write(status);
+            engineStatus()
+            // process.stdout.write(status);
 
         }
     } catch (err) {

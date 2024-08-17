@@ -21,20 +21,23 @@ export async function readNodeVersion() {
         version = await readFileSystem(DIR_PATH_PROJECT_DOT_NVMRC_FILE)
         version = await readFileSystem(DIR_PATH_PROJECT_DOT_NODE_VERSION_FILE)
 
-
         if (version) {
             return version
         } else {
-            let pkgStr = await readFileSystem(DIR_PATH_PROJECT_PACKAGE_JSON_FILE)
+            let pkgStr: string = await readFileSystem(DIR_PATH_PROJECT_PACKAGE_JSON_FILE)
+            if (pkgStr) {
+                pkg = JSON.parse(pkgStr)
 
-            pkg = JSON.parse(pkgStr)
+                if (pkg.engines && pkg.engines.node) {
 
-            if (pkg.engines && pkg.engines.node) {
-
-                return pkg.engines.node
-            } else {
-                version = readFileSystem(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
-                return version
+                    return pkg.engines.node
+                } else {
+                    version = await readFileSystem(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
+                    return version
+                }
+            } else { 
+                version = await readFileSystem(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
+                    return version
             }
 
         }
@@ -48,14 +51,7 @@ export async function readNodeVersion() {
 
 export async function removeNodeVersion(version: string) {
     try {
-        const spinnerFrames = ['|', '/', '-', '\\'];
-        let currentFrame = 0;
-        function spin() {
-            readline.cursorTo(process.stdout, 0);
-            process.stdout.write(spinnerFrames[currentFrame]);
-            currentFrame = (currentFrame + 1) % spinnerFrames.length;
-        }
-        const intervalId = setInterval(spin, 100);
+
         const files = fs.readdirSync(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, { withFileTypes: true });
         // console.log('รายการโฟลเดอร์:');
         const versions: any[] = []
@@ -73,7 +69,6 @@ export async function removeNodeVersion(version: string) {
         // ลบโฟลเดอร์และเนื้อหาภายใน (recursive)
         fs.rmSync(`${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}/${groupVersions[0]}`, { recursive: true, force: true });
         // console.log('โฟลเดอร์ถูกลบเรียบร้อยแล้ว!');
-        clearInterval(intervalId);
         return MSG_REMOVE_NODE_VERSION_SUCCESS(groupVersions[0])
     } catch (err) {
         // console.error('เกิดข้อผิดพลาดในการลบโฟลเดอร์:', err);

@@ -52,12 +52,12 @@ export async function downloadFile(url: string, outputLocationPath: string, cb: 
 function tryDeleteFile(filePath: string, retries = 5, delay = 1000) {
     fs.unlink(filePath, (err) => {
         if (err) {
-            // if (retries > 0 && err.code === 'EBUSY') {
-            //     // console.log('File is busy, retrying...');
-            //     setTimeout(() => tryDeleteFile(filePath, retries - 1, delay), delay);
-            // } else {
-            //     // console.error('Error removing file:', err);
-            // }
+            if (retries > 0 && err.code === 'EBUSY') {
+                // console.log('File is busy, retrying...');
+                setTimeout(() => tryDeleteFile(filePath, retries - 1, delay), delay);
+            } else {
+                // console.error('Error removing file:', err);
+            }
         } else {
             // console.log('File removed successfully.');
         }
@@ -67,12 +67,12 @@ function tryDeleteFile(filePath: string, retries = 5, delay = 1000) {
 function tryRename(oldPath:string, newPath:string, retries = 5, delay = 1000) {
     fs.rename(oldPath, newPath, (err) => {
         if (err) {
-            // if (retries > 0 && (err.code === 'EPERM' || err.code === 'EBUSY')) {
-            //     // console.log('File is busy or permission error, retrying...');
-            //     setTimeout(() => tryRename(oldPath, newPath, retries - 1, delay), delay);
-            // } else {
-            //     // console.error('Error renaming file:', err);
-            // }
+            if (retries > 0 && (err.code === 'EPERM' || err.code === 'EBUSY')) {
+                // console.log('File is busy or permission error, retrying...');
+                setTimeout(() => tryRename(oldPath, newPath, retries - 1, delay), delay);
+            } else {
+                // console.error('Error renaming file:', err);
+            }
         } else {
             // console.log('File renamed successfully.');
         }
@@ -108,10 +108,12 @@ export function extractZip(filePath: string, extractToPath: string, version: str
         myStream.on('end', function () {
             // end of the operation, get the number of folders involved in the operation
 
+       
             const oldPath = path.join(extractToPath, `node-${version}-${platform}-${arch}`);
             const newPath = path.join(extractToPath, `${version}`);
             tryDeleteFile(filePath)
             tryRename(oldPath,newPath)
+
           
         })
 

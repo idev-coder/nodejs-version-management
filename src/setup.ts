@@ -18,6 +18,8 @@ export async function setupNodeVersion(name: string) {
         if (statusDirVersion) {
             let statusOutputDir = await validateDirVersion(outputDir)
             if (statusOutputDir) {
+                console.log("a");
+                
                 setupFileDotNRC(name)
             } else {
                 let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER,name)

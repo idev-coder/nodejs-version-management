@@ -41,8 +41,17 @@ export async function nodeOnlineVersion(name?: string | null | undefined) {
 
                         if (strToArr.length === 1) {
                             let dataVersions = listVersion.filter((val: NodeVersionType) => {
-                                let splitVersion = val.version.split(".")
-                                if (splitVersion[0].includes(newName)) return val
+                                let splitVersion: any = val.version.split(".")
+
+                                // console.log(splitVersion[0].split("")[1]);
+
+                                if (newName.length === 1) {
+
+                                    if (splitVersion[0].split("")[1].includes(newName)) return val
+                                } else {
+
+                                    if (splitVersion[0].includes(newName)) return val
+                                }
                             })
                             return {
                                 message: dataVersions[0].version,

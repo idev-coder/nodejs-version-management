@@ -1,6 +1,6 @@
 {
   "name": "n",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "main": "bin/n.js",
   "bin": {
     "n": "bin/n.js"

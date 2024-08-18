@@ -25,7 +25,7 @@ export async function engineStatus() {
             shell: true,
         })
         npm.stdout.on('data', (data) => {
-            process.stdout.write(`npm v${data}`);
+            process.stdout.write(`\nnpm v${data}`);
         });
 
     } catch (err: any) {

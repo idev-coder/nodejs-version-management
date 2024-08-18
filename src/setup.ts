@@ -6,7 +6,7 @@ import { arch, DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_FOLDER, DIR
 
 
 export async function setupNodeVersion(name: string) {
-    const url = `${NODE_DOWNLOAD_MIRROR_URI}/release/${name}/node-${name}-${platform}-${arch}.${os.platform() === "win32" ? "zip" :"tar.xz"}`
+    const url = `${NODE_DOWNLOAD_MIRROR_URI}/release/${name}/node-${name}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`
     const filePath = path.basename(url);
     const outputDir = path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name);
     const outputDownloadDir = path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, filePath);
@@ -20,8 +20,8 @@ export async function setupNodeVersion(name: string) {
             if (statusOutputDir) {
                 setupFileDotNRC(name)
             } else {
-                let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER,name)
-                if (download) setupFileDotNRC(name)
+                downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
+                setupFileDotNRC(name)
             }
         }
 
@@ -35,8 +35,8 @@ export async function setupNodeVersion(name: string) {
 
             if (status) {
 
-                let download = await downloadAndUnzip(url, filePath, DIR_PATH_HOME_DOT_N_VERSION_FOLDER,name)
-                if (download) setupFileDotNRC(name)
+                downloadAndUnzip(url, filePath, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
+                setupFileDotNRC(name)
 
             }
         }
@@ -71,7 +71,7 @@ async function setupFileDotNRC(fileContent: string) {
         fs.writeFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, fileContent);
         console.log(fileContent);
         // console.log('ไฟล์ถูกสร้างเรียบร้อยแล้ว!');
-        
+
         return true
     } catch (err) {
         // console.error('เกิดข้อผิดพลาดในการสร้างไฟล์:', err);

@@ -1,9 +1,9 @@
 {
   "name": "n",
   "version": "1.0.1",
-  "main": "dist/src/index.js",
+  "main": "bin/n.js",
   "bin": {
-    "n": "dist/src/index.js"
+    "n": "bin/n.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

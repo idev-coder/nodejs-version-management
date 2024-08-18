@@ -1,7 +1,7 @@
 # `n` – Interactively Manage Your Node.js Versions
 
 ### How To Use
-``sh
+```sh
 Usage: n [options] [COMMAND] [args]
 
 Commands:
@@ -48,4 +48,4 @@ Versions:
     lts               Newest Long Term Support official release
     latest            Newest official release
     boron, carbon     Codenames for release streams
-``
+```

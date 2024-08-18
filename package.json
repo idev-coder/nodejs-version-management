@@ -1,6 +1,6 @@
 {
   "name": "@idev-coder/n",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "bin/n.js",
   "bin": {
     "n": "bin/n.js"

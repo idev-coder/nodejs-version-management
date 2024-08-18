@@ -15,7 +15,9 @@
     "nvm",
     "node",
     "npm",
-    "npx"
+    "npx",
+    "manager",
+    "version"
   ],
   "author": "",
   "license": "ISC",

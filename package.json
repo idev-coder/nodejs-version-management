@@ -1,5 +1,5 @@
 {
-  "name": "n",
+  "name": "@idev-coder/n",
   "version": "1.0.0",
   "main": "bin/n.js",
   "bin": {

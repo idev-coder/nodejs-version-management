@@ -3,7 +3,7 @@
 ## How To Setup
 
 #### Windows
-1. Download link => [Download Click Now!]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.1.0/n.exe")
+1. Download link => [Download Click Now!]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.2.0/n.exe")
 
 2. Create New Folder Example Folder Name => `n` 
 

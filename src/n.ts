@@ -3,6 +3,7 @@ import { DIR_PATH_PROJECT_PACKAGE_JSON_FILE, MSG_NODE_VERSION_NOT_FOULT } from "
 import { readFileSystem, readNodeVersion } from "./engine-fs"
 import { node } from './node'
 import { npm } from "./npm"
+import { npx } from "./npx"
 
 function pkgScripts() {
     const pkgStr = readFileSystem(DIR_PATH_PROJECT_PACKAGE_JSON_FILE)
@@ -58,7 +59,7 @@ export async function n(options: any[]) {
             }
         } else {
             // console.log(MSG_NODE_VERSION_NOT_FOULT);
-            return MSG_NODE_VERSION_NOT_FOULT
+            return npx(options)
         }
 
     } catch (err: any) {

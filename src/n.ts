@@ -52,14 +52,14 @@ export async function n(options: any[]) {
                     } else {
 
                         // console.log(MSG_NODE_VERSION_NOT_FOULT);
-                        return MSG_NODE_VERSION_NOT_FOULT
+                        return npx(options)
                     }
                 }
 
             }
         } else {
             // console.log(MSG_NODE_VERSION_NOT_FOULT);
-            return npx(process.argv.slice(2))
+            return MSG_NODE_VERSION_NOT_FOULT
         }
 
     } catch (err: any) {

@@ -59,7 +59,7 @@ export async function n(options: any[]) {
             }
         } else {
             // console.log(MSG_NODE_VERSION_NOT_FOULT);
-            return npx(options)
+            return npx(process.argv.slice(2))
         }
 
     } catch (err: any) {

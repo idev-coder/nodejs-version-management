@@ -1,6 +1,20 @@
 # `n` – Interactively Manage Your Node.js Versions
 
-### How To Use
+## How To Setup
+
+#### Windows
+1. Download link => https://github.com/idev-coder/nodejs-version-management/releases/download/v1.1.0/n.exe
+
+2. Create New Folder Example Folder Name => `n` 
+
+3. Copy `n.exe` Move to Folder `n`
+
+4. Copy Path Folder `n` Example `C:\n` 
+
+5. Set Enviroment Variables
+!['Image'](/images/env.png)
+
+## How To Use
 ```sh
 Usage: n [options] [COMMAND] [args]
 

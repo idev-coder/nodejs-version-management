@@ -17,7 +17,9 @@ export async function options(key: string) {
             return `v${VERSION}`
         } else if (["h", "help", "-h", "-H", "--help"].includes(key)) {
             return help()
-        } else if (["i", "install", "use", "add"].includes(key)) {
+        } else if (key === "init") {
+            npm(["init", ...opts])
+        } if (["i", "install", "use", "add"].includes(key)) {
             if (opts[0]) {
                 let option = await nodeOnlineVersion(opts[0])
                 if (option.data.length === 1) {

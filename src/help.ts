@@ -20,6 +20,7 @@ Commands:
   n npm                          Run NPM
   n npx                          Run NPX
   n version                      Output Version n
+  n init [args ...]              New file package.json
 
 Options:
 
@@ -36,6 +37,7 @@ Aliases:
   node: node                                         Engine Run node
   npm: npm                                           Engine Run npx
   npx: npx                                           Engine Run npx
+  init: init                                         New file package.json
 
 Versions:
 

@@ -3,7 +3,7 @@
 ## How To Setup
 
 #### Windows
-1. Download link => [Download Click Now!]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.0/n.exe")
+1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.1/n.exe]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.1/n.exe")
 
 2. Create New Folder Example Folder Name => `n` 
 
@@ -13,7 +13,7 @@
 
 5. Set Enviroment Variables
 
-!['Image'](/images/env.png)
+!['Image'](https://idev-coder.github.io/nodejs-version-management/images/env.png)
 
 ## How To Use
 ```sh

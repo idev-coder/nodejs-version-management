@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { downloadAndUnzip } from './download';
 import { arch, DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, NODE_DOWNLOAD_MIRROR_URI, platform } from './common';
-
+import { execFileSync,spawn } from 'child_process'
 
 export async function setupNodeVersion(name: string) {
     const url = `${NODE_DOWNLOAD_MIRROR_URI}/release/${name}/node-${name}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`
@@ -64,6 +64,46 @@ async function setupFloderDotNVersion() {
         // console.error('เกิดข้อผิดพลาดในการสร้างโฟลเดอร์:', err);
         return false
     }
+}
+
+
+
+function updateEnvironmentVariables(newVersion: string) {
+    try {
+        const stdout = execFileSync('echo %PATH%', {
+            stdio: 'pipe',
+            encoding: 'utf8',
+            shell: true
+        });
+        const oldVersion = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, 'utf8')
+
+        const arrEnvPath = stdout.split(";")
+        const oldVersionPath =`${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${oldVersion}\\`
+        const newVersionPath = `${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${newVersion}\\`
+
+        if(arrEnvPath.includes(oldVersionPath)) {
+
+            arrEnvPath[arrEnvPath.indexOf(oldVersionPath)] = newVersionPath
+            let arrEnvPathToStr = arrEnvPath.toString()
+            let value = arrEnvPathToStr.replace(new RegExp(',', 'g'), ';');
+            spawn(`set`, [`PATH=${value}`], {
+                stdio: ['pipe', 'pipe', process.stderr],
+                shell: true
+            });
+        }else {
+            arrEnvPath.push(newVersionPath)
+            let arrEnvPathToStr = arrEnvPath.toString()
+            let value = arrEnvPathToStr.replace(new RegExp(',', 'g'), ';');
+            spawn(`set`, [`PATH=${value}`], {
+                stdio: ['pipe', 'pipe', process.stderr],
+                shell: true
+            });
+        }
+
+    } catch (err: any) {
+
+    }
+
 }
 
 async function setupFileDotNRC(fileContent: string) {

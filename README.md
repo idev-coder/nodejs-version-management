@@ -15,6 +15,32 @@
 
 !['Image'](https://idev-coder.github.io/nodejs-version-management/images/env.png)
 
+#### Ubuntu
+1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.2/n]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.2/n")
+
+2. Create New Folder Example Folder Name => `n-folder` 
+
+3. Copy `n` Move to Folder `n-folder`
+
+4. Copy Path Folder `n-folder` Example `/home/[username]/n-folder` 
+
+5. Set Enviroment Variables
+
+##### Step 1
+```sh
+nano ~/.bashrc
+```
+
+##### Step 2 edit file `.bashrc` and add `export PATH=$PATH:/home/[username]/n-folder`
+```sh
+export PATH=$PATH:/home/[username]/n-folder
+```
+
+##### Step 3
+```sh
+source ~/.bashrc
+```
+
 ## How To Use
 ```sh
 Usage: n [options] [COMMAND] [args]

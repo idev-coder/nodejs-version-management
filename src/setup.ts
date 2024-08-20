@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { downloadAndUnzip } from './download';
-import { arch, DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, NODE_DOWNLOAD_MIRROR_URI, platform } from './common';
-import { execFileSync,spawn } from 'child_process'
+import { arch, DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, DIR_PATH_HOME_FOLDER, NODE_DOWNLOAD_MIRROR_URI, platform } from './common';
+import { execFileSync, spawn } from 'child_process'
 
 export async function setupNodeVersion(name: string) {
     const url = `${NODE_DOWNLOAD_MIRROR_URI}/release/${name}/node-${name}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`
@@ -70,44 +70,50 @@ async function setupFloderDotNVersion() {
 
 function updateEnvironmentVariables(newVersion: string) {
     try {
-        const stdout = execFileSync('echo %PATH%', {
-            stdio: 'pipe',
-            encoding: 'utf8',
-            shell: true
-        });
-        const oldVersion = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, 'utf8')
 
-        const arrEnvPath = stdout.split(";")
-        const oldVersionPath =`${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${oldVersion}\\`
-        const newVersionPath = `${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${newVersion}\\`
+        if (os.platform() === "win32") {
+            const newVersionPath = `${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${newVersion}\\`
 
-        if(arrEnvPath.includes(oldVersionPath)) {
-
-            arrEnvPath[arrEnvPath.indexOf(oldVersionPath)] = newVersionPath
-            let arrEnvPathToStr = arrEnvPath.toString()
-            let value = arrEnvPathToStr.replace(new RegExp(',', 'g'), ';');
-            spawn(`set`, [`PATH=${value}`], {
+            spawn(`setx`, [`N`, `${newVersionPath}`], {
                 stdio: ['pipe', 'pipe', process.stderr],
                 shell: true
             });
-        }else {
-            arrEnvPath.push(newVersionPath)
-            let arrEnvPathToStr = arrEnvPath.toString()
-            let value = arrEnvPathToStr.replace(new RegExp(',', 'g'), ';');
-            spawn(`set`, [`PATH=${value}`], {
+
+            spawn(`setx`, [`PATH`, `"%PATH%;%N%"`], {
                 stdio: ['pipe', 'pipe', process.stderr],
                 shell: true
             });
+
+          
+        } else {
+
+            const bashrc = fs.readFileSync(`${DIR_PATH_HOME_FOLDER}/.bashrc`, 'utf8')
+
+            const newVersionPath = `${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${newVersion}\\`
+
+            let value = `${bashrc}
+
+export PATH=$PATH:${newVersionPath}`
+
+            fs.writeFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, value);
+
+            spawn('source', ['~/.bashrc'], {
+                stdio: ['pipe', 'pipe', process.stderr],
+                shell: true
+            });
+
+
         }
 
     } catch (err: any) {
-
+        return err
     }
 
 }
 
 async function setupFileDotNRC(fileContent: string) {
     try {
+        updateEnvironmentVariables(fileContent)
         fs.writeFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, fileContent);
         console.log(fileContent);
         // console.log('ไฟล์ถูกสร้างเรียบร้อยแล้ว!');

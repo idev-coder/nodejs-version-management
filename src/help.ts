@@ -3,7 +3,7 @@ export function help() {
     return `
 Usage: n [options] [COMMAND] [args]
 
-Commands:
+Usage:
 
   n                              Display downloaded Node.js versions and install selection
   n [args ...]                   Execute with [args ...]
@@ -27,9 +27,11 @@ Options:
   -v, -V, -version, --version         Output version of n
   -h, -H, --help                      Display help information
 
-Aliases:
+All commands:
 
   install: i, install, use, add                      Install and Set Default Version Node.JS 
+  install-test: it, install-test
+  install-ci-test: ict, install-ci-test
   uninstall: un, rm, del, uninstall, remove, delete  Remove Node.JS Version
   list: ls, list                                     List Local Node.JS Version
   list-remote: lsr, list-remote                      List Online All Node.JS Version
@@ -38,6 +40,64 @@ Aliases:
   npm: npm                                           Engine Run npx
   npx: npx                                           Engine Run npx
   init: init                                         New file package.json
+  access: access
+  adduser: adduser
+  audit: audit
+  bugs: bugs
+  cache: cache
+  ci: ci
+  completion: completion
+  config: config
+  dedupe: dedupe
+  deprecate: deprecate
+  diff: diff
+  dist-tag: dt, dist-tag
+  docs: docs,
+  doctor: doctor
+  edit: edit
+  exec: exec
+  explain: explain
+  explore: explore
+  find-dupes: fd, find-dupes
+  fund: fund
+  get: get
+  help-search: hs, help-search
+  init: init
+  hook: hook
+  link: link
+  ll: ll
+  login: login
+  logout: logout
+  org: org
+  outdated: outdated
+  query: query
+  rebuild: rebuild
+  repo: repo
+  restart: restart
+  root: root
+  run-script: rs, run-script
+  sbom: sbom
+  search: search
+  set: set
+  shrinkwrap: shrinkwrap
+  star: star
+  stars: stars
+  stop: stop
+  team: team
+  view: view
+  whoami: whoami
+  token: token
+  unpublish: unpublish
+  unstar: unstar
+  update: u, update
+  owner: owner
+  pack: pack
+  ping: ping
+  pkg: pkg
+  prefix: prefix
+  profile: profile
+  prune: prune
+  publish: publish
 
 Versions:
 

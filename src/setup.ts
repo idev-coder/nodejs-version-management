@@ -74,15 +74,15 @@ function updateEnvironmentVariables(newVersion: string) {
         if (os.platform() === "win32") {
             const newVersionPath = `${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${newVersion}\\`
 
-            spawn(`setx`, [`N`, `${newVersionPath}`], {
+            spawn(`setx`, [`N_HOME`, `${newVersionPath}`], {
                 stdio: ['pipe', 'pipe', process.stderr],
                 shell: true
             });
 
-            spawn(`setx`, [`PATH`, `"%PATH%;%N%"`], {
-                stdio: ['pipe', 'pipe', process.stderr],
-                shell: true
-            });
+            // spawn(`setx`, [`PATH`, `"%PATH%;%N%"`], {
+            //     stdio: ['pipe', 'pipe', process.stderr],
+            //     shell: true
+            // });
 
           
         } else {

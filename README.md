@@ -3,7 +3,7 @@
 ## How To Setup
 
 #### Windows
-1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.2/n.exe]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.2/n.exe")
+1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.3/n.exe]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.3/n.exe")
 
 2. Create New Folder Example Folder Name => `n` 
 
@@ -15,8 +15,11 @@
 
 !['Image'](https://idev-coder.github.io/nodejs-version-management/images/env.png)
 
+6. Add Enviroment Variables `%N_HOME%` in PATH 
+
+
 #### Ubuntu
-1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.2/n]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.2/n")
+1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.3/n]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.3/n")
 
 2. Create New Folder Example Folder Name => `n-folder` 
 

@@ -1,6 +1,6 @@
 {
   "name": "@idev-coder/n",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "main": "bin/n.js",
   "homepage": "https://idev-coder.github.io/nodejs-version-management/",
   "bugs": "https://github.com/idev-coder/nodejs-version-management/issues",

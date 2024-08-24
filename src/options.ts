@@ -83,7 +83,7 @@ export async function options(key: string) {
                 }
             } else {
 
-                npm(opts)
+                npm(process.argv.slice(2))
             }
         } else if (["un", "rm", "del", "uninstall", "remove", "delete"].includes(key)) {
             if (opts[0]) {

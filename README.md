@@ -3,7 +3,7 @@
 ## How To Setup
 
 #### Windows
-1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.4/n-for-windows.zip]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.4/n-for-windows.zip")
+1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.5/n-for-windows.zip]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.5/n-for-windows.zip")
 
 2. Extrect File ZIP `n-for-windows.zip`
 

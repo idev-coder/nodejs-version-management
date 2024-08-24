@@ -3,46 +3,15 @@
 ## How To Setup
 
 #### Windows
-1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.3/n.exe]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.3/n.exe")
+1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.4/n-for-windows.zip]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.4/n-for-windows.zip")
 
-2. Create New Folder Example Folder Name => `n` 
+2. Extrect File ZIP `n-for-windows.zip`
 
-3. Copy `n.exe` Move to Folder `n`
+3. Copy Path Folder `n-for-windows` Example `C:\n-for-windows` 
 
-4. Copy Path Folder `n` Example `C:\n` 
+4. Set Enviroment Variables
 
-5. Set Enviroment Variables
-
-!['Image'](https://idev-coder.github.io/nodejs-version-management/images/env.png)
-
-6. Add Enviroment Variables `%N_HOME%` in PATH 
-
-
-#### Ubuntu
-1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.3/n]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.3/n")
-
-2. Create New Folder Example Folder Name => `n-folder` 
-
-3. Copy `n` Move to Folder `n-folder`
-
-4. Copy Path Folder `n-folder` Example `/home/[username]/n-folder` 
-
-5. Set Enviroment Variables
-
-##### Step 1
-```sh
-nano ~/.bashrc
-```
-
-##### Step 2 edit file `.bashrc` and add `export PATH=$PATH:/home/[username]/n-folder`
-```sh
-export PATH=$PATH:/home/[username]/n-folder
-```
-
-##### Step 3
-```sh
-source ~/.bashrc
-```
+5. Add Path `C:\n-for-windows` in Enviroment Variables PATH 
 
 ## How To Use
 ```sh

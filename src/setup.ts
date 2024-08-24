@@ -113,7 +113,7 @@ export PATH=$PATH:${newVersionPath}`
 
 async function setupFileDotNRC(fileContent: string) {
     try {
-        updateEnvironmentVariables(fileContent)
+        // updateEnvironmentVariables(fileContent)
         fs.writeFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, fileContent);
         console.log(fileContent);
         // console.log('ไฟล์ถูกสร้างเรียบร้อยแล้ว!');

@@ -1,7 +1,12 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    n:'./src/n-bin.ts',
+    node:'./src/node-bin.ts',
+    npm:'./src/npm-bin.ts',
+    npx:'./src/npx-bin.ts'
+  },
   mode: 'production',
   target: 'node',
   module: {
@@ -17,7 +22,7 @@ module.exports = {
     extensions: ['.ts', '.js']
   },
   output: {
-    filename: 'n.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'bin'),
   },
 };

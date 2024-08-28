@@ -2,7 +2,6 @@ import { MSG_NODE_NOT_VERSION_TYPE, MSG_NODE_VERSION_NOT_FOULT } from "./common"
 import { setupNodeVersion } from "./setup";
 import { nodeOnlineVersion } from "./node-version";
 import { options } from "./options";
-import { engineStatus } from "./engine-status";
 import { n } from "./n";
 
 export async function commands(keys: any[]) {
@@ -14,27 +13,40 @@ export async function commands(keys: any[]) {
                 if (option.data.length === 1) {
                     setupNodeVersion(option.message)
                 } else {
-                    process.stdout.write(option.message);
+                    console.log(option.message);
+                    // process.stdout.write(option.message);
+                    process.exit(0);
                 }
             } else if (option.message === MSG_NODE_VERSION_NOT_FOULT) {
-                process.stdout.write(option.message);
+                // process.stdout.write(option.message);
+                console.log(option.message);
             } else if (option.message === MSG_NODE_NOT_VERSION_TYPE) {
                 let option = await options(keys[0])
                 if (option) {
-
-                    process.stdout.write(option);
+                    console.log(option);
+                    process.exit(0);
+                    // process.stdout.write(option);
                 } else {
-                    n(keys)
+                    let nStr = await n(keys)
+                    console.log(nStr);
+                    process.exit(0);
+
                 }
 
             }
         } else {
-            engineStatus()
+            // engineStatus()
+            console.log("");
+
+            process.exit(0);
             // process.stdout.write(status);
 
         }
     } catch (err) {
-        process.stdout.write(`${err}`);
+        // process.stdout.write(`${err}`);
+        console.log(`${err}`);
+
+        process.exit(0);
 
     }
 

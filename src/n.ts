@@ -20,34 +20,34 @@ export async function n(options: any[]) {
         strToArr = options[0].split("")
         if (version) {
             if (strToArr[0].includes(".")) {
-                stdout = node(options);
+                return node(options);
                 // console.log(stdout);
-                return stdout
+                // return stdout
 
             } else if (strToArr[0].includes("/")) {
-                stdout = node(options);
+                return node(options);
                 // console.log(stdout);
-                return stdout
+                // return stdout
             } else {
                 if (options[0].includes(".mjs")) {
-                    stdout = node(options);
+                    return node(options);
                     // console.log(stdout);
-                    return stdout
+                    // return stdout
                 } else if (options[0].includes(".js")) {
-                    stdout = node(options);
+                    return node(options);
                     // console.log(stdout);
-                    return stdout
+                    // return stdout
                 } else {
                     const packageScripts = pkgScripts()
                     if (packageScripts[`${options[0]}`]) {
                         if (options[0] === "start") {
-                            stdout = npm([options[0]])
+                            return npm([options[0]])
                             // console.log(stdout);
-                            return stdout
+                            // return stdout
                         } else {
-                            stdout = npm(["run", options[0]])
+                            return npm(["run", options[0]])
                             // console.log(stdout);
-                            return stdout
+                            // return stdout
                         }
                     } else {
 
@@ -63,6 +63,6 @@ export async function n(options: any[]) {
         }
 
     } catch (err: any) {
-        return err
+        return `${err}`
     }
 }

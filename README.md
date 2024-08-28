@@ -3,15 +3,15 @@
 ## How To Setup
 
 #### Windows
-1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.5/n-for-windows.zip]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.5/n-for-windows.zip")
+1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.6/bin.exe]("https://github.com/idev-coder/nodejs-version-management/releases/download/v1.3.6/bin.exe")
 
-2. Extrect File ZIP `n-for-windows.zip`
+2. cd to file `bin.exe`
 
-3. Copy Path Folder `n-for-windows` Example `C:\n-for-windows` 
+3. use cmd `bin.exe setup`
 
 4. Set Enviroment Variables
 
-5. Add Path `C:\n-for-windows` in Enviroment Variables PATH 
+5. Add Path `%N_HOME%` in Enviroment Variables PATH 
 
 ## How To Use
 ```sh
@@ -51,7 +51,7 @@ All commands:
   list-remote: lsr, list-remote                      List Online All Node.JS Version
   run: run                                           Engine Run Auto node, npm, npx
   node: node                                         Engine Run node
-  npm: npm                                           Engine Run npx
+  npm: npm                                           Engine Run npm
   npx: npx                                           Engine Run npx
   init: init                                         New file package.json
   access: access

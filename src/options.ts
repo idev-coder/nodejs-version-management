@@ -6,7 +6,7 @@ import { node } from "./node";
 import { nodeLocalVersion, nodeOnlineVersion } from "./node-version";
 import { npm } from "./npm";
 import { npx } from "./npx";
-import { setupNodeVersion } from "./setup";
+import { setup, setupNodeVersion } from "./setup";
 
 export async function options(key: string) {
     try {
@@ -24,10 +24,10 @@ export async function options(key: string) {
                     setupNodeVersion(option.message)
 
                 } else {
-                    npm(["install", ...opts])
+                    return npm(["install", ...opts])
                 }
             } else {
-                npm(["install"])
+                return npm(["install"])
             }
         } else if (['access', 'adduser', 'audit', 'bugs', 'cache', 'ci', 'completion',
             'config', 'dedupe', 'deprecate', 'diff', 'dt', 'dist-tag', 'docs', 'doctor',
@@ -39,60 +39,61 @@ export async function options(key: string) {
             'search', 'set', 'shrinkwrap', 'star', 'stars', 'stop', 'team',
             'token', 'unpublish', 'unstar', 'u', 'update',
             'view', 'whoami'].includes(key)) {
+
+
             if (['u', 'update'].includes(key)) {
                 if (opts.length > 0) {
-                    npm(["update", ...opts])
+                    return npm(["update", ...opts])
                 } else {
-                    npm(["update"])
+                    return npm(["update"])
                 }
             } else if (['ict', 'install-ci-test'].includes(key)) {
                 if (opts.length > 0) {
-                    npm(["install-ci-test", ...opts])
+                    return npm(["install-ci-test", ...opts])
                 } else {
-                    npm(["install-ci-test"])
+                    return npm(["install-ci-test"])
                 }
             } else if (['it', 'install-test'].includes(key)) {
                 if (opts.length > 0) {
-                    npm(["install-test", ...opts])
+                    return npm(["install-test", ...opts])
                 } else {
-                    npm(["install-test"])
+                    return npm(["install-test"])
                 }
             } else if (['hs', 'help-search'].includes(key)) {
                 if (opts.length > 0) {
-                    npm(["help-search", ...opts])
+                    return npm(["help-search", ...opts])
                 } else {
-                    npm(["help-search"])
+                    return npm(["help-search"])
                 }
             } else if (['rs', 'run-script'].includes(key)) {
                 if (opts.length > 0) {
-                    npm(["run-script", ...opts])
+                    return npm(["run-script", ...opts])
                 } else {
-                    npm(["run-script"])
+                    return npm(["run-script"])
                 }
             } else if (['dt', 'dist-tag'].includes(key)) {
                 if (opts.length > 0) {
-                    npm(["dist-tag", ...opts])
+                    return npm(["dist-tag", ...opts])
                 } else {
-                    npm(["dist-tag"])
+                    return npm(["dist-tag"])
                 }
             } else if (['fd', 'find-dupes'].includes(key)) {
                 if (opts.length > 0) {
-                    npm(["find-dupes", ...opts])
+                    return npm(["find-dupes", ...opts])
                 } else {
-                    npm(["find-dupes"])
+                    return npm(["find-dupes"])
                 }
             } else {
-
-                npm(process.argv.slice(2))
+                return npm(process.argv.slice(2))
             }
         } else if (["un", "rm", "del", "uninstall", "remove", "delete"].includes(key)) {
             if (opts[0]) {
                 let option = await nodeOnlineVersion(opts[0])
                 if (option.data.length === 1) {
-                   return removeNodeVersion(opts[0])
+                    return removeNodeVersion(opts[0])
 
                 } else {
-                    npm(["uninstall", ...opts])
+                    return npm(["uninstall", ...opts])
                 }
             } else {
                 return MSG_NODE_VERSION_NOT_FOULT
@@ -114,19 +115,22 @@ export async function options(key: string) {
 
             }
         } else if (key === "run") {
-            n(opts)
+            return n(opts)
         } else if (key === "node") {
-            node(opts)
+            return node(opts)
         } else if (key === "npm") {
-            npm(opts)
+            return npm(opts)
         } else if (key === "npx") {
-            npx(opts)
+            return npx(opts)
+        } else if (key === "setup") {
+            return setup()
         } else {
+
             return ""
         }
 
 
     } catch (err) {
-        return err
+        return `${err}`
     }
 }

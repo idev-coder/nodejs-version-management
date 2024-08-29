@@ -45,29 +45,55 @@ if [ $? -ne 0 ]; then
   fi
   no_node_dir
 fi
-NPM_PREFIX_JS="$CLI_BASEDIR/node_modules/npm/bin/npm-prefix.js"
 NPX_CLI_JS="$CLI_BASEDIR/node_modules/npm/bin/npx-cli.js"
-NPM_PREFIX=${'`"$NODE_EXE" "$NPM_PREFIX_JS"`'}
 if [ $? -ne 0 ]; then
   no_node_dir
 fi
-NPM_PREFIX_NPX_CLI_JS="$NPM_PREFIX/node_modules/npm/bin/npx-cli.js"
 
-# a path that will fail -f test on any posix bash
-NPX_WSL_PATH="/.."
-
-# WSL can run Windows binaries, so we have to give it the win32 path
-# however, WSL bash tests against posix paths, so we need to construct that
-# to know if npm is installed globally.
-if [ "$IS_WSL" == "true" ]; then
-  NPX_WSL_PATH=${'`wslpath "$NPM_PREFIX_NPX_CLI_JS"`'}
-fi
-if [ -f "$NPM_PREFIX_NPX_CLI_JS" ] || [ -f "$NPX_WSL_PATH" ]; then
-  NPX_CLI_JS="$NPM_PREFIX_NPX_CLI_JS"
-fi
 
 "$NODE_EXE" "$NPX_CLI_JS" "$@"
+`
+    } else if (type === "cmd") {
+      return `:: Created by npm, please don't edit manually.
+@ECHO OFF
 
+SETLOCAL
+
+SET "NODE_EXE=${basePath}\\node.exe"
+IF NOT EXIST "%NODE_EXE%" (
+  SET "NODE_EXE=node"
+)
+
+SET "NPX_CLI_JS=${basePath}\\node_modules\\npm\\bin\\npx-cli.js"
+
+"%NODE_EXE%" "%NPX_CLI_JS%" %*
+`
+    } else if (type === "pwsh") {
+      return `#!/usr/bin/env pwsh
+
+$NODE_EXE="${basePath}/node.exe"
+if (-not (Test-Path $NODE_EXE)) {
+  $NODE_EXE="${basePath}/node"
+}
+if (-not (Test-Path $NODE_EXE)) {
+  $NODE_EXE="node"
+}
+
+$NPX_CLI_JS="${basePath}/node_modules/npm/bin/npx-cli.js"
+
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "Could not determine Node.js install directory"
+  exit 1
+}
+
+# Support pipeline input
+if ($MyInvocation.ExpectingInput) {
+  $input | & $NODE_EXE $NPX_CLI_JS $args
+} else {
+  & $NODE_EXE $NPX_CLI_JS $args
+}
+
+exit $LASTEXITCODE
 
 `
     }
@@ -116,26 +142,11 @@ if [ $? -ne 0 ]; then
   fi
   no_node_dir
 fi
-NPM_PREFIX_JS="$CLI_BASEDIR/node_modules/npm/bin/npm-prefix.js"
 NPM_CLI_JS="$CLI_BASEDIR/node_modules/npm/bin/npm-cli.js"
-NPM_PREFIX=${'`"$NODE_EXE" "$NPM_PREFIX_JS"`'}
 if [ $? -ne 0 ]; then
   no_node_dir
 fi
-NPM_PREFIX_NPM_CLI_JS="$NPM_PREFIX/node_modules/npm/bin/npm-cli.js"
 
-# a path that will fail -f test on any posix bash
-NPM_WSL_PATH="/.."
-
-# WSL can run Windows binaries, so we have to give it the win32 path
-# however, WSL bash tests against posix paths, so we need to construct that
-# to know if npm is installed globally.
-if [ "$IS_WSL" == "true" ]; then
-  NPM_WSL_PATH=${'`wslpath "$NPM_PREFIX_NPM_CLI_JS"`'}
-fi
-if [ -f "$NPM_PREFIX_NPM_CLI_JS" ] || [ -f "$NPM_WSL_PATH" ]; then
-  NPM_CLI_JS="$NPM_PREFIX_NPM_CLI_JS"
-fi
 
 "$NODE_EXE" "$NPM_CLI_JS" "$@"
 
@@ -151,14 +162,7 @@ IF NOT EXIST "%NODE_EXE%" (
   SET "NODE_EXE=node"
 )
 
-SET "NPM_PREFIX_JS=${basePath}\\node_modules\\npm\\bin\\npm-prefix.js"
 SET "NPM_CLI_JS=${basePath}\\node_modules\\npm\\bin\\npm-cli.js"
-FOR /F "delims=" %%F IN ('CALL "%NODE_EXE%" "%NPM_PREFIX_JS%"') DO (
-  SET "NPM_PREFIX_NPM_CLI_JS=%%F\\node_modules\\npm\\bin\\npm-cli.js"
-)
-IF EXIST "%NPM_PREFIX_NPM_CLI_JS%" (
-  SET "NPM_CLI_JS=%NPM_PREFIX_NPM_CLI_JS%"
-)
 
 "%NODE_EXE%" "%NPM_CLI_JS%" %*
 `
@@ -174,16 +178,10 @@ if (-not (Test-Path $NODE_EXE)) {
 
 $NPM_PREFIX_JS="${basePath}/node_modules/npm/bin/npm-prefix.js"
 $NPM_CLI_JS="${basePath}/node_modules/npm/bin/npm-cli.js"
-$NPM_PREFIX=(& $NODE_EXE $NPM_PREFIX_JS)
 
 if ($LASTEXITCODE -ne 0) {
   Write-Host "Could not determine Node.js install directory"
   exit 1
-}
-
-$NPM_PREFIX_NPM_CLI_JS="$NPM_PREFIX/node_modules/npm/bin/npm-cli.js"
-if (Test-Path $NPM_PREFIX_NPM_CLI_JS) {
-  $NPM_CLI_JS=$NPM_PREFIX_NPM_CLI_JS
 }
 
 # Support pipeline input

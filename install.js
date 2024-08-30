@@ -2,7 +2,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const readline = require('readline')
-const { spawn,execFileSync } = require('child_process')
+const { spawn, execFileSync } = require('child_process')
 const progressStream = require('progress-stream')
 const https = require('https')
 
@@ -13,7 +13,35 @@ const DIR_PATH_HOME_FOLDER = os.homedir()
 const DIR_PATH_HOME_DOT_N_FOLDER = path.join(DIR_PATH_HOME_FOLDER, 'n-test');
 const DIR_PATH_HOME_BIN = path.join(DIR_PATH_HOME_DOT_N_FOLDER, "bin");
 const DIR_PATH_HOME_NPM = path.join(DIR_PATH_HOME_BIN, "npm");
-const DIR_PATH_HOME_NODE_EXE = path.join(DIR_PATH_HOME_BIN, `${os.platform() === "win32" ? "node.exe" : "node"}`);
+
+function runCommand(command, args, cwd) {
+    return new Promise((resolve, reject) => {
+        const process = spawn(command, args, { cwd, stdio: 'inherit', shell: true });
+
+        process.on('close', (code) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(new Error(`Process exited with code ${code}`));
+            }
+        });
+
+        process.on('error', (err) => {
+            reject(err);
+        });
+    });
+}
+
+async function setupProject() {
+    try {
+        await runCommand(DIR_PATH_HOME_NPM, ['init', '-y'], DIR_PATH_HOME_DOT_N_FOLDER);
+
+        await runCommand(DIR_PATH_HOME_NPM, ['install', '@idev-coder/n'], DIR_PATH_HOME_DOT_N_FOLDER);
+
+    } catch (error) {
+        console.error('Error during setup:', error);
+    }
+}
 
 async function install() {
     const url = `https://nodejs.org/download/release/${version}/node-${version}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`
@@ -225,45 +253,13 @@ function setup() {
             fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\n`, script_bin_sh_n)
             fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\n.ps1`, script_bin_pwsh_n)
             fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\n.cmd`, script_bin_cmd_n)
-            fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\package.json`, `{
-    name:"n",
-    "dependencies": {
-        "@idev-coder/n": "lates",
-    }
-}`)
 
 
             setx.on('close', (code) => {
-                const cdHome = spawn(`cd`, ['/d',DIR_PATH_HOME_DOT_N_FOLDER], {
-                    stdio: ['pipe', 'pipe', process.stderr],
-                    shell: true
-                });
-                cdHome.on('close', (code) => {
-                    // process.stdout.write(`child process close all stdio with code ${code}`);
-                    const packageInit = execFileSync("dir", {
-                        stdio: ['pipe', 'pipe', process.stderr],
-                        encoding: 'utf8',
-                        shell: true
-                    });
-                    console.log(packageInit);
+                setupProject().then(() => {
+
                     res("Done!")
-                    // packageInit.stdout.on('data', (data) => {
-                    //     console.log(data);
-
-                    // })
-                    // packageInit.on('close', (code) => {
-                    //     res("Done!")
-                    //     // const packageIinstall = spawn(DIR_PATH_HOME_NPM, [`i`, `@idev-coder/n`], {
-                    //     //     stdio: ['pipe', 'pipe', process.stderr],
-                    //     //     shell: true
-                    //     // });
-
-                    //     // packageIinstall.on('close', (code) => {
-                    //     //     res("Done!")
-
-                    //     // })
-                    // })
-                });
+                })
             });
 
         } catch (err) {
@@ -292,7 +288,7 @@ function binScripts(type) {
   fi
   
   # กำหนดตำแหน่งของ n-cli.js
-  N_CLI_JS="$PWD/node_modules/@idev-coder/bin/n-cli.js"
+  N_CLI_JS="$PWD/node_modules/@idev-coder/n/bin/n-cli.js"
   
   # รัน node กับ n-cli.js และเก็บผลลัพธ์
   N_BIN=$("$NODE_EXE" "$N_CLI_JS" "$@")
@@ -335,14 +331,14 @@ function binScripts(type) {
   setlocal
   
   rem กำหนดตำแหน่งของไฟล์ node
-  set "NODE_EXE=%~dp0bin\node.exe"
+  set "NODE_EXE=%~dp0\\bin\\node.exe"
   
   rem ตรวจสอบว่าไฟล์ที่กำหนดมีอยู่หรือไม่
-  if not exist "%NODE_EXE%" set "NODE_EXE=%~dp0bin\node"
+  if not exist "%NODE_EXE%" set "NODE_EXE=%~dp0\\bin\\node"
   if not exist "%NODE_EXE%" set "NODE_EXE=node"
   
   rem กำหนดตำแหน่งของ n-cli.js
-  set "N_CLI_JS=%~dp0node_modules\@idev-coder\bin\n-cli.js"
+  set "N_CLI_JS=%~dp0\\node_modules\\@idev-coder\\n\\bin\\n-cli.js"
   
   rem รัน node กับ n-cli.js และเก็บผลลัพธ์
   for /f "delims=" %%i in ('"%NODE_EXE%" "%N_CLI_JS%" %*') do set "N_BIN=%%i"
@@ -390,7 +386,7 @@ function binScripts(type) {
     $NODE_EXE="node"
   }
   
-  $N_CLI_JS="$PSScriptRoot/node_modules/@idev-coder/bin/n-cli.js"
+  $N_CLI_JS="$PSScriptRoot/node_modules/@idev-coder/n/bin/n-cli.js"
   
   $N_BIN = & $NODE_EXE $N_CLI_JS $args
   

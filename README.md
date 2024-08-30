@@ -1,19 +1,44 @@
-# `n` – Interactively Manage Your Node.js Versions
+<div align="center">
+<a href="https://github.com/idev-coder/nodejs-version-management">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/idev-coder/nodejs-version-management/main/images/logo.svg" />
+    <img src="https://raw.githubusercontent.com/idev-coder/nodejs-version-management/main/images/logo.svg" height="50" alt="nvm project logo" />
+  </picture>
+</a>
+ <br>
+<h1>Manage Your Node.js Versions </h1>
+<br>
+<br>
 
-## How To Setup
+[![npm][npm]][npm-url] 
 
-#### Windows
-1. Download link => [https://github.com/idev-coder/nodejs-version-management/releases/download/v2.0.0/bin.exe]("https://github.com/idev-coder/nodejs-version-management/releases/download/v2.0.0/bin.exe")
+ <br>
 
-2. cd to file `bin.exe`
+<a href="https://npmcharts.com/compare/@idev-coder/n?minimal=true">
+		<img src="https://img.shields.io/npm/dm/@idev-coder/n.svg">
+</a> 
+<a href="https://packagephobia.com/result?p=@idev-coder/n">
+		<img src="https://packagephobia.com/badge?p=@idev-coder/n" alt="install size">
+</a>
+<a href="https://opencollective.com/nodejs-version-management#sponsors">
+		<img src="https://opencollective.com/nodejs-version-management/sponsors/badge.svg">
+</a>
+<a href="https://github.com/idev-coder/nodejs-version-management/graphs/contributors">
+		<img src="https://img.shields.io/github/contributors/idev-coder/nodejs-version-management.svg">
+</a>
 
-3. use cmd `bin.exe setup`
+ <p>
+ n is a tool used for managing and switching between different versions of Node.js with ease. With its concise and convenient commands, users can quickly install and switch between various Node.js versions without needing to reconfigure or reinstall. Additionally, n helps users efficiently manage Node.js versions without worrying about code compatibility across different versions of Node.js. 
+  </p>
+</div>
 
-4. Set Enviroment Variables
-
-5. Add Path `%N_HOME%` in Enviroment Variables PATH 
 
 ## How To Use
+
+
+[Download](https://github.com/idev-coder/nodejs-version-management/releases/) => https://github.com/idev-coder/nodejs-version-management/releases/
+
+
 ```sh
 Usage: n [options] [COMMAND] [args]
 

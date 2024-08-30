@@ -1,6 +1,6 @@
 {
   "name": "@idev-coder/n",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "bin/n-cli.js",
   "homepage": "https://idev-coder.github.io/nodejs-version-management/",
   "bugs": {

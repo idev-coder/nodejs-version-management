@@ -21,8 +21,8 @@ export async function setupNodeVersion(name: string) {
       setupFileDotNRC(name)
 
     } else {
-      downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
       setupFileDotNRC(name)
+      downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
     }
   } else {
     let status: boolean
@@ -31,8 +31,8 @@ export async function setupNodeVersion(name: string) {
 
     if (status) {
 
-      downloadAndUnzip(url, filePath, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
       setupFileDotNRC(name)
+      downloadAndUnzip(url, filePath, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
 
     }
   }
@@ -54,18 +54,18 @@ function updateEnvironmentVariables(newVersion: string) {
   try {
 
     var newVersionPath: any = `${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${newVersion}`
-    
-    const script_bin_sh_npm:any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npm', 'sh')
-    const script_bin_cmd_npm:any = binScripts(newVersionPath, 'npm', 'cmd')
-    const script_bin_pwsh_npm:any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npm', 'pwsh')
 
-    const script_bin_sh_npx:any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npx', 'sh')
-    const script_bin_cmd_npx:any = binScripts(newVersionPath, 'npx', 'cmd')
-    const script_bin_pwsh_npx:any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npx', 'pwsh')
+    const script_bin_sh_npm: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npm', 'sh')
+    const script_bin_cmd_npm: any = binScripts(newVersionPath, 'npm', 'cmd')
+    const script_bin_pwsh_npm: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npm', 'pwsh')
 
-    const script_bin_sh_node:any = binScripts(newVersionPath.replaceAll('\\', '/'), 'node', 'sh')
-    const script_bin_cmd_node:any = binScripts(newVersionPath, 'node', 'cmd')
-    const script_bin_pwsh_node:any = binScripts(newVersionPath.replaceAll('\\', '/'), 'node', 'pwsh')
+    const script_bin_sh_npx: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npx', 'sh')
+    const script_bin_cmd_npx: any = binScripts(newVersionPath, 'npx', 'cmd')
+    const script_bin_pwsh_npx: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npx', 'pwsh')
+
+    const script_bin_sh_node: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'node', 'sh')
+    const script_bin_cmd_node: any = binScripts(newVersionPath, 'node', 'cmd')
+    const script_bin_pwsh_node: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'node', 'pwsh')
 
     fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\npm`, script_bin_sh_npm)
     fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\npm.cmd`, script_bin_cmd_npm)
@@ -88,8 +88,8 @@ function updateEnvironmentVariables(newVersion: string) {
 
 async function setupFileDotNRC(fileContent: string) {
   try {
-    updateEnvironmentVariables(fileContent)
     fs.writeFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, fileContent);
+    updateEnvironmentVariables(fileContent)
     console.log(fileContent);
 
     return true
@@ -118,19 +118,46 @@ async function validateDirVersion(directoryPathName: string) {
 
 export async function setup() {
   try {
+    const setx = spawn(`setx`, [`N_HOME`, `${DIR_PATH_PROJECT}`], {
+      stdio: ['pipe', 'pipe', process.stderr],
+      shell: true
+    });
 
-    const script_bin_sh_n:any = binScripts(DIR_PATH_PROJECT, 'n_script', 'sh')
-    const script_bin_pwsh_n:any = binScripts(DIR_PATH_PROJECT, 'n_script', 'pwsh')
-    const script_bin_cmd_n:any = binScripts(DIR_PATH_PROJECT, 'n_script', 'cmd')
+    const script_bin_sh_n: any = binScripts(DIR_PATH_PROJECT, 'n_script', 'sh')
+    const script_bin_pwsh_n: any = binScripts(DIR_PATH_PROJECT, 'n_script', 'pwsh')
+    const script_bin_cmd_n: any = binScripts(DIR_PATH_PROJECT, 'n_script', 'cmd')
 
     fs.writeFileSync(`${DIR_PATH_PROJECT}\\n`, script_bin_sh_n)
     fs.writeFileSync(`${DIR_PATH_PROJECT}\\n.ps1`, script_bin_pwsh_n)
     fs.writeFileSync(`${DIR_PATH_PROJECT}\\n.cmd`, script_bin_cmd_n)
 
-    spawn(`setx`, [`N_HOME`, `${DIR_PATH_PROJECT}`], {
-      stdio: ['pipe', 'pipe', process.stderr],
-      shell: true
+
+    setx.on('close', (code) => {
+      // process.stdout.write(`child process close all stdio with code ${code}`);
+      const packageInit =  spawn(`./bin.exe`, [`init`, `-y`], {
+        stdio: ['pipe', 'pipe', process.stderr],
+        shell: true
+      });
+      packageInit.on('close', (code) => {
+        const packageIinstall =  spawn(`./bin.exe`, [`i`, `@idev-coder/n`], {
+          stdio: ['pipe', 'pipe', process.stderr],
+          shell: true
+        });
+
+        packageIinstall.on('close', (code) => {
+          console.log("Done!");
+          
+        })
+      })
     });
+
+    setx.on('exit', (code) => {
+      // process.stdout.write(`child process exited with code ${code}`);
+
+    });
+   
+
+
     return DIR_PATH_PROJECT
   } catch (err) {
     return `${err}`

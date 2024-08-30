@@ -2,11 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    bin:'./src/bin.ts',
-    n:'./src/n-bin.ts',
-    node:'./src/node-bin.ts',
-    npm:'./src/npm-bin.ts',
-    npx:'./src/npx-bin.ts'
+    "n-cli":'./src/n-cli.ts'
   },
   mode: 'production',
   target: 'node',

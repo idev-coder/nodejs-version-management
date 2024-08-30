@@ -19,12 +19,6 @@ if [ ${'`uname`'} = 'Linux' ] && type wslpath &>/dev/null ; then
   IS_WSL="true"
 fi
 
-function no_node_dir {
-  # if this didn't work, then everything else below will fail
-  echo "Could not determine Node.js install directory" >&2
-  exit 1
-}
-
 NODE_EXE="$basedir/node.exe"
 if ! [ -x "$NODE_EXE" ]; then
   NODE_EXE="$basedir/node"
@@ -36,15 +30,7 @@ fi
 # this path is passed to node.exe, so it needs to match whatever
 # kind of paths Node.js thinks it's using, typically win32 paths.
 CLI_BASEDIR="$("$NODE_EXE" -p 'require("path").dirname(process.execPath)' 2> /dev/null)"
-if [ $? -ne 0 ]; then
-  # this fails under WSL 1 so add an additional message. we also suppress stderr above
-  # because the actual error raised is not helpful. in WSL 1 node.exe cannot handle
-  # output redirection properly. See https://github.com/microsoft/WSL/issues/2370
-  if [ "$IS_WSL" == "true" ]; then
-    echo "WSL 1 is not supported. Please upgrade to WSL 2 or above." >&2
-  fi
-  no_node_dir
-fi
+
 NPX_CLI_JS="$CLI_BASEDIR/node_modules/npm/bin/npx-cli.js"
 if [ $? -ne 0 ]; then
   no_node_dir
@@ -81,11 +67,6 @@ if (-not (Test-Path $NODE_EXE)) {
 
 $NPX_CLI_JS="${basePath}/node_modules/npm/bin/npx-cli.js"
 
-if ($LASTEXITCODE -ne 0) {
-  Write-Host "Could not determine Node.js install directory"
-  exit 1
-}
-
 # Support pipeline input
 if ($MyInvocation.ExpectingInput) {
   $input | & $NODE_EXE $NPX_CLI_JS $args
@@ -116,12 +97,6 @@ if [ ${'`uname`'} = 'Linux' ] && type wslpath &>/dev/null ; then
   IS_WSL="true"
 fi
 
-function no_node_dir {
-  # if this didn't work, then everything else below will fail
-  echo "Could not determine Node.js install directory" >&2
-  exit 1
-}
-
 NODE_EXE="$basedir/node.exe"
 if ! [ -x "$NODE_EXE" ]; then
   NODE_EXE="$basedir/node"
@@ -133,15 +108,7 @@ fi
 # this path is passed to node.exe, so it needs to match whatever
 # kind of paths Node.js thinks it's using, typically win32 paths.
 CLI_BASEDIR="$("$NODE_EXE" -p 'require("path").dirname(process.execPath)' 2> /dev/null)"
-if [ $? -ne 0 ]; then
-  # this fails under WSL 1 so add an additional message. we also suppress stderr above
-  # because the actual error raised is not helpful. in WSL 1 node.exe cannot handle
-  # output redirection properly. See https://github.com/microsoft/WSL/issues/2370
-  if [ "$IS_WSL" == "true" ]; then
-    echo "WSL 1 is not supported. Please upgrade to WSL 2 or above." >&2
-  fi
-  no_node_dir
-fi
+
 NPM_CLI_JS="$CLI_BASEDIR/node_modules/npm/bin/npm-cli.js"
 if [ $? -ne 0 ]; then
   no_node_dir
@@ -176,13 +143,7 @@ if (-not (Test-Path $NODE_EXE)) {
   $NODE_EXE="node"
 }
 
-$NPM_PREFIX_JS="${basePath}/node_modules/npm/bin/npm-prefix.js"
 $NPM_CLI_JS="${basePath}/node_modules/npm/bin/npm-cli.js"
-
-if ($LASTEXITCODE -ne 0) {
-  Write-Host "Could not determine Node.js install directory"
-  exit 1
-}
 
 # Support pipeline input
 if ($MyInvocation.ExpectingInput) {
@@ -213,12 +174,6 @@ if [ ${'`uname`'} = 'Linux' ] && type wslpath &>/dev/null ; then
   IS_WSL="true"
 fi
 
-function no_node_dir {
-  # if this didn't work, then everything else below will fail
-  echo "Could not determine Node.js install directory" >&2
-  exit 1
-}
-
 NODE_EXE="$basedir/node.exe"
 if ! [ -x "$NODE_EXE" ]; then
   NODE_EXE="$basedir/node"
@@ -230,15 +185,6 @@ fi
 # this path is passed to node.exe, so it needs to match whatever
 # kind of paths Node.js thinks it's using, typically win32 paths.
 CLI_BASEDIR="$("$NODE_EXE" -p 'require("path").dirname(process.execPath)' 2> /dev/null)"
-if [ $? -ne 0 ]; then
-  # this fails under WSL 1 so add an additional message. we also suppress stderr above
-  # because the actual error raised is not helpful. in WSL 1 node.exe cannot handle
-  # output redirection properly. See https://github.com/microsoft/WSL/issues/2370
-  if [ "$IS_WSL" == "true" ]; then
-    echo "WSL 1 is not supported. Please upgrade to WSL 2 or above." >&2
-  fi
-  no_node_dir
-fi
 
 "$NODE_EXE" "$@"
 `
@@ -265,11 +211,6 @@ if (-not (Test-Path $NODE_EXE)) {
 if (-not (Test-Path $NODE_EXE)) {
   $NODE_EXE="node"
 }
-  
-if ($LASTEXITCODE -ne 0) {
-  Write-Host "Could not determine Node.js install directory"
-  exit 1
-}
 
 # Support pipeline input
 if ($MyInvocation.ExpectingInput) {
@@ -285,163 +226,146 @@ exit $LASTEXITCODE
     if (type === "sh") {
       return `#!/usr/bin/env bash
 
-# Define the BIN_EXE variable
-BIN_EXE="$(dirname "$0")/bin.exe"
+# กำหนดตำแหน่งของไฟล์ node
+NODE_EXE="$PWD/bin/node.exe"
 
-# Check if the file exists
-if [ ! -f "$BIN_EXE" ]; then
-    BIN_EXE="$(dirname "$0")/bin"
+# ตรวจสอบว่าไฟล์ที่กำหนดมีอยู่หรือไม่
+if [ ! -f "$NODE_EXE" ]; then
+  NODE_EXE="$PWD/bin/node"
+fi
+if [ ! -f "$NODE_EXE" ]; then
+  NODE_EXE="node"
 fi
 
-# Check if the file still does not exist
-if [ ! -f "$BIN_EXE" ]; then
-    BIN_EXE="bin"
-fi
+# กำหนดตำแหน่งของ n-cli.js
+N_CLI_JS="$PWD/node_modules/@idev-coder/bin/n-cli.js"
 
-# Run the executable and capture its output
-N_BIN=$("$BIN_EXE" "$@")
-EXIT_CODE=$?
+# รัน node กับ n-cli.js และเก็บผลลัพธ์
+N_BIN=$("$NODE_EXE" "$N_CLI_JS" "$@")
 
-# Check the exit code
-if [ $EXIT_CODE -eq 0 ]; then
-    if [ -n "$N_BIN" ]; then
-        # Split the output into array elements
-        IFS=' ' read -r -a array <<< "$N_BIN"
-        first_token=${"${array[0]}"}
-        remaining_tokens=${"${array[@]:1}"}
-
-        case "$first_token" in
-            node*)
-                $first_token $remaining_tokens
-                ;;
-            npm*)
-                $first_token $remaining_tokens
-                ;;
-            npx*)
-                $first_token $remaining_tokens
-                ;;
-            *)
-                echo "$N_BIN"
-                ;;
-        esac
-    else
-        # Output the version information
-        N_V=$("$BIN_EXE" -v)
-        NODE_V=$(node -v)
-        NPM_V=$(npm -v)
-        NPX_V=$(npx -v)
-
-        echo "n $N_V"
-        echo "node $NODE_V"
-        echo "npm v$NPM_V"
-        echo "npx v$NPX_V"
-    fi
+if [ -n "$N_BIN" ]; then
+    # แยกผลลัพธ์โดยใช้เว้นวรรค
+    IFS=' ' read -r -a array <<< "$N_BIN"
+    cmd=${"${array[0]}"}
+    args=${"${array[@]:1}"
+}
+    case "$cmd" in
+        *node*)
+            "$cmd" $args
+            ;;
+        *npm*)
+            "$cmd" $args
+            ;;
+        *npx*)
+            "$cmd" $args
+            ;;
+        *)
+            echo "$N_BIN"
+            ;;
+    esac
 else
-    echo "Node.js script failed with exit code $EXIT_CODE"
+    # ถ้า $N_BIN ไม่มีค่า
+    N_V=$("$NODE_EXE" "$N_CLI_JS" "-v")
+    NODE_V=$(node -v)
+    NPM_V=$(npm -v)
+    NPX_V=$(npx -v)
+
+    echo "n $N_V"
+    echo "node $NODE_V"
+    echo "npm v$NPM_V"
+    echo "npx v$NPX_V"
 fi
 `
     } else if (type === "cmd") {
       return `@echo off
 setlocal
 
-REM Define the BIN_EXE variable
-set "BIN_EXE=%~dp0bin.exe"
+rem กำหนดตำแหน่งของไฟล์ node
+set "NODE_EXE=%~dp0bin\node.exe"
 
-REM Check if the file exists
-if not exist "%BIN_EXE%" (
-    set "BIN_EXE=%~dp0bin"
-)
+rem ตรวจสอบว่าไฟล์ที่กำหนดมีอยู่หรือไม่
+if not exist "%NODE_EXE%" set "NODE_EXE=%~dp0bin\node"
+if not exist "%NODE_EXE%" set "NODE_EXE=node"
 
-REM Check if the file still does not exist
-if not exist "%BIN_EXE%" (
-    set "BIN_EXE=bin"
-)
+rem กำหนดตำแหน่งของ n-cli.js
+set "N_CLI_JS=%~dp0node_modules\@idev-coder\bin\n-cli.js"
 
-REM Run the executable and capture its output
-for /f "delims=" %%i in ('"%BIN_EXE%" %*') do set "N_BIN=%%i"
+rem รัน node กับ n-cli.js และเก็บผลลัพธ์
+for /f "delims=" %%i in ('"%NODE_EXE%" "%N_CLI_JS%" %*') do set "N_BIN=%%i"
 
-REM Check the error level (equivalent to $LASTEXITCODE in PowerShell)
-if %ERRORLEVEL% equ 0 (
-    if not "%N_BIN%"=="" (
-        REM Split the output into array elements
-        setlocal enabledelayedexpansion
-        set "array=!N_BIN!"
-        for /f "tokens=1,* delims= " %%a in ("!array!") do (
-            set "first_token=%%a"
-            set "remaining_tokens=%%b"
-        )
+if defined N_BIN (
+    rem แยกผลลัพธ์โดยใช้เว้นวรรค
+    for /f "tokens=1,* delims= " %%a in ("%N_BIN%") do (
+        set "cmd=%%a"
+        set "args=%%b"
+    )
 
-        REM Check the first token and execute the corresponding command
-        if /i "%first_token%"=="node" (
-            call %first_token% %remaining_tokens%
-        ) else if /i "%first_token%"=="npm" (
-            call %first_token% %remaining_tokens%
-        ) else if /i "%first_token%"=="npx" (
-            call %first_token% %remaining_tokens%
-        ) else (
-            echo %N_BIN%
-        )
-        endlocal
+    rem รันคำสั่งที่เกี่ยวข้อง
+    if "%cmd%"=="node" (
+        %cmd% %args%
+    ) else if "%cmd%"=="npm" (
+        %cmd% %args%
+    ) else if "%cmd%"=="npx" (
+        %cmd% %args%
     ) else (
-        REM Output the version information
-        for /f "delims=" %%v in ('"%BIN_EXE% -v"') do set "N_V=%%v"
-        for /f "delims=" %%v in ('"node -v"') do set "NODE_V=%%v"
-        for /f "delims=" %%v in ('"npm -v"') do set "NPM_V=%%v"
-        for /f "delims=" %%v in ('"npx -v"') do set "NPX_V=%%v"
-
-        echo n %N_V%
-        echo node %NODE_V%
-        echo npm v%NPM_V%
-        echo npx v%NPX_V%
+        echo %N_BIN%
     )
 ) else (
-    echo Node.js script failed with exit code %ERRORLEVEL%
+    rem ถ้า %N_BIN% ไม่มีค่า
+    for /f "delims=" %%v in ('"%NODE_EXE%" "%N_CLI_JS%" -v') do set "N_V=%%v"
+    for /f "delims=" %%v in ('node -v') do set "NODE_V=%%v"
+    for /f "delims=" %%v in ('npm -v') do set "NPM_V=%%v"
+    for /f "delims=" %%v in ('npx -v') do set "NPX_V=%%v"
+    
+    echo n %N_V%
+    echo node %NODE_V%
+    echo npm v%NPM_V%
+    echo npx v%NPX_V%
 )
 
 endlocal
 `
     } else if (type === "pwsh") {
       return `#!/usr/bin/env pwsh
-$BIN_EXE="$PSScriptRoot/bin.exe"
+$NODE_EXE="$PSScriptRoot/bin/node.exe"
 
-if (-not (Test-Path $BIN_EXE)) {
-  $BIN_EXE="$PSScriptRoot/bin"
+if (-not (Test-Path $NODE_EXE)) {
+  $NODE_EXE="$PSScriptRoot/bin/node"
 }
-if (-not (Test-Path $BIN_EXE)) {
-  $BIN_EXE="bin"
+if (-not (Test-Path $NODE_EXE)) {
+  $NODE_EXE="node"
 }
 
-$N_BIN = & $BIN_EXE $args
-if ($LASTEXITCODE -eq 0) {
-    if($N_BIN) {
-        $array = $N_BIN -split " "
-       if($array[0] -like "*node*") {
-            $NODE_ARGS = $array[1..($array.Length - 1)]
-            $BIN_NODE = $array[0]
-            & $BIN_NODE $NODE_ARGS
-       }elseif($array[0] -like "*npm*") {
-            $NPM_ARGS = $array[1..($array.Length - 1)]
-            $BIN_NPM = $array[0]
-            & $BIN_NPM $NPM_ARGS
-       }elseif($array[0] -like "*npx*") {
-            $NPX_ARGS = $array[1..($array.Length - 1)]
-            $BIN_NPX = $array[0]
-            & $BIN_NPX $NPX_ARGS
-       }else {
-            Write-Output $N_BIN
-       }
+$N_CLI_JS="$PSScriptRoot/node_modules/@idev-coder/bin/n-cli.js"
+
+$N_BIN = & $NODE_EXE $N_CLI_JS $args
+
+if($N_BIN) {
+    $array = $N_BIN -split " "
+    if($array[0] -like "*node*") {
+        $NODE_ARGS = $array[1..($array.Length - 1)]
+        $BIN_NODE = $array[0]
+        & $BIN_NODE $NODE_ARGS
+    }elseif($array[0] -like "*npm*") {
+        $NPM_ARGS = $array[1..($array.Length - 1)]
+        $BIN_NPM = $array[0]
+        & $BIN_NPM $NPM_ARGS
+    }elseif($array[0] -like "*npx*") {
+        $NPX_ARGS = $array[1..($array.Length - 1)]
+        $BIN_NPX = $array[0]
+        & $BIN_NPX $NPX_ARGS
     }else {
-        $N_V = & $BIN_EXE "-v"
-        $NODE_V = & "node" "-v"
-        $NPM_V = & "npm" "-v"
-        $NPX_V = & "npx" "-v"
-        Write-Output "n $N_V"
-        Write-Output "node $NODE_V"
-        Write-Output "npm v$NPM_V"
-        Write-Output "npx v$NPX_V"
+        Write-Output $N_BIN
     }
-} else {
-    Write-Output "Node.js script failed with exit code $LASTEXITCODE"
+}else {
+    $N_V = & $NODE_EXE $N_CLI_JS "-v"
+    $NODE_V = & "node" "-v"
+    $NPM_V = & "npm" "-v"
+    $NPX_V = & "npx" "-v"
+    Write-Output "n $N_V"
+    Write-Output "node $NODE_V"
+    Write-Output "npm v$NPM_V"
+    Write-Output "npx v$NPX_V"
 }
 
 `

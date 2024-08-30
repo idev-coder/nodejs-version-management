@@ -127,7 +127,7 @@ export function extractTarXZ(filePath: string, extractToPath: string, version: s
 // ดาวน์โหลดและแตกไฟล์
 export async function downloadAndUnzip(url: string, filePath: string, outputDir: string, version: string) {
     try {
-        console.log('กำลังดาวน์โหลดไฟล์...');
+        console.log('Installing...');
 
         const res = await downloadFile(url, filePath);
 

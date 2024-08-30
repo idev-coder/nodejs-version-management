@@ -9,7 +9,9 @@
 <h1>Node.JS Version Management</h1>
 <br>
 
-[![npm][npm]][npm-url] 
+<a href="https://npmjs.com/package/@idev-coder/n">
+		<img src="https://img.shields.io/npm/v/@idev-coder/n.svg">
+</a> 
 
  <br>
 
@@ -206,6 +208,3 @@ This is how we use the donations:
 - Support projects that are voted most (work in progress)
 - Infrastructure cost
 - Fees for money handling
-
-[npm]: https://img.shields.io/npm/v/@idev-coder/n.svg
-[npm-url]: https://npmjs.com/package/@idev-coder/n

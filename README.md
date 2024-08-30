@@ -31,12 +31,31 @@
  <p>
  n is a tool used for managing and switching between different versions of Node.js with ease. With its concise and convenient commands, users can quickly install and switch between various Node.js versions without needing to reconfigure or reinstall. Additionally, n helps users efficiently manage Node.js versions without worrying about code compatibility across different versions of Node.js. 
   </p>
- <br>
-  <a href="https://github.com/idev-coder/nodejs-version-management/releases/latest" target="_blank">Download!</a>
+
 </div>
 
+## Table of Contents
+1. [Install](#install)
+2. [Introduction](#introduction)
+3. [How To Use](#how-to-use)
+4. [Core Team](#core-team)
+5. [Sponsoring](#sponsoring)
 
-## How To Use
+<h2 align="center">Install</h2>
+Install with npm:
+
+```bash
+npm install -g @idev-coder/n
+```
+
+Install with Windows: <a href="https://github.com/idev-coder/nodejs-version-management/releases/latest" target="_blank">Download!</a>
+
+<h2 align="center">Introduction</h2>
+
+`n` is a tool used for managing and switching between different versions of Node.js with ease. With its concise and convenient commands, users can quickly install and switch between various Node.js versions without needing to reconfigure or reinstall. Additionally, `n` helps users efficiently manage Node.js versions without worrying about code compatibility across different versions of Node.js. 
+
+
+<h2 align="center">How To Use</h2>
 
 
 ```sh

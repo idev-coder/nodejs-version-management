@@ -150,5 +150,43 @@ Versions:
     boron, carbon     Codenames for release streams
 ```
 
+<h2 align="center">Core Team</h2>
+
+<table align="center">
+  <tbody>
+    <tr>
+      <td align="center" valign="top">
+        <img width="150" height="150" src="https://github.com/idev-coder.png?s=150">
+        <br>
+        <a href="https://github.com/idev-coder">IDev Coder</a>
+        <p>Core</p>
+        <br>
+        <p>Founder of n</p>
+      </td>
+      <td align="center" valign="top">
+        <img width="150" height="150" src="https://github.com/n-devs.png?s=150">
+        <br>
+        <a href="https://github.com/n-devs">Natthapat Piasangka</a>
+        <p>Development</p>
+        <br>
+        <p>Developer of n</p>
+      </td>
+     </tr>
+  </tbody>
+</table>
+
+<h2 align="center">Sponsoring</h2>
+
+Most of the core team members, `n` contributors and contributors in the ecosystem do this open source work in their free time. If you use `n` for a serious task, and you'd like us to invest more time on it, please donate. This project increases your income/productivity too. It makes development and applications faster and it reduces the required bandwidth.
+
+This is how we use the donations:
+
+- Allow the core team to work on `n`
+- Thank contributors if they invested a large amount of time in contributing
+- Support projects in the ecosystem that are of great value for users
+- Support projects that are voted most (work in progress)
+- Infrastructure cost
+- Fees for money handling
+
 [npm]: https://img.shields.io/npm/v/@idev-coder/n.svg
 [npm-url]: https://npmjs.com/package/@idev-coder/n

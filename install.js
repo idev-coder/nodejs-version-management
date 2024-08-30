@@ -10,7 +10,7 @@ const version = "v18.20.4"
 const platform = os.platform() === "win32" ? "win" : os.platform()
 const arch = os.arch()
 const DIR_PATH_HOME_FOLDER = os.homedir()
-const DIR_PATH_HOME_DOT_N_FOLDER = path.join(DIR_PATH_HOME_FOLDER, 'n-test');
+const DIR_PATH_HOME_DOT_N_FOLDER = path.join(DIR_PATH_HOME_FOLDER, '.n');
 const DIR_PATH_HOME_BIN = path.join(DIR_PATH_HOME_DOT_N_FOLDER, "bin");
 const DIR_PATH_HOME_NPM = path.join(DIR_PATH_HOME_BIN, "npm");
 

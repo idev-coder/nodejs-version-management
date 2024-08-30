@@ -6,8 +6,7 @@
   </picture>
 </a>
  <br>
-<h1>Manage Your Node.js Versions </h1>
-<br>
+<h1>Node.JS Version Management</h1>
 <br>
 
 [![npm][npm]][npm-url] 
@@ -27,16 +26,17 @@
 		<img src="https://img.shields.io/github/contributors/idev-coder/nodejs-version-management.svg">
 </a>
 
+ <br>
+
  <p>
  n is a tool used for managing and switching between different versions of Node.js with ease. With its concise and convenient commands, users can quickly install and switch between various Node.js versions without needing to reconfigure or reinstall. Additionally, n helps users efficiently manage Node.js versions without worrying about code compatibility across different versions of Node.js. 
   </p>
+ <br>
+  <a href="https://github.com/idev-coder/nodejs-version-management/releases/latest" target="_blank">Download!</a>
 </div>
 
 
 ## How To Use
-
-
-[Download](https://github.com/idev-coder/nodejs-version-management/releases/) => https://github.com/idev-coder/nodejs-version-management/releases/
 
 
 ```sh
@@ -149,3 +149,6 @@ Versions:
     latest            Newest official release
     boron, carbon     Codenames for release streams
 ```
+
+[npm]: https://img.shields.io/npm/v/@idev-coder/n.svg
+[npm-url]: https://npmjs.com/package/@idev-coder/n

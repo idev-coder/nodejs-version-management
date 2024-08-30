@@ -6,7 +6,7 @@ import { node } from "./node";
 import { nodeLocalVersion, nodeOnlineVersion } from "./node-version";
 import { npm } from "./npm";
 import { npx } from "./npx";
-import { setup, setupNodeVersion } from "./setup";
+import {  setupNodeVersion } from "./setup";
 
 export async function options(key: string) {
     try {
@@ -122,8 +122,6 @@ export async function options(key: string) {
             return npm(opts)
         } else if (key === "npx") {
             return npx(opts)
-        } else if (key === "setup") {
-            return setup()
         } else {
 
             return ""

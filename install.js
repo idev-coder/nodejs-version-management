@@ -2,7 +2,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const readline = require('readline')
-const { spawn, execFileSync } = require('child_process')
+const { spawn } = require('child_process')
 const progressStream = require('progress-stream')
 const https = require('https')
 
@@ -10,38 +10,9 @@ const version = "v18.20.4"
 const platform = os.platform() === "win32" ? "win" : os.platform()
 const arch = os.arch()
 const DIR_PATH_HOME_FOLDER = os.homedir()
-const DIR_PATH_HOME_DOT_N_FOLDER = path.join(DIR_PATH_HOME_FOLDER, '.n');
+const DIR_PATH_HOME_DOT_N_FOLDER = path.join(DIR_PATH_HOME_FOLDER, 'n');
 const DIR_PATH_HOME_BIN = path.join(DIR_PATH_HOME_DOT_N_FOLDER, "bin");
 const DIR_PATH_HOME_NPM = path.join(DIR_PATH_HOME_BIN, "npm");
-
-function runCommand(command, args, cwd) {
-    return new Promise((resolve, reject) => {
-        const process = spawn(command, args, { cwd, stdio: 'inherit', shell: true });
-
-        process.on('close', (code) => {
-            if (code === 0) {
-                resolve();
-            } else {
-                reject(new Error(`Process exited with code ${code}`));
-            }
-        });
-
-        process.on('error', (err) => {
-            reject(err);
-        });
-    });
-}
-
-async function setupProject() {
-    try {
-        await runCommand(DIR_PATH_HOME_NPM, ['init', '-y'], DIR_PATH_HOME_DOT_N_FOLDER);
-
-        await runCommand(DIR_PATH_HOME_NPM, ['install', '@idev-coder/n'], DIR_PATH_HOME_DOT_N_FOLDER);
-
-    } catch (error) {
-        console.error('Error during setup:', error);
-    }
-}
 
 async function install() {
     const url = `https://nodejs.org/download/release/${version}/node-${version}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`
@@ -198,6 +169,7 @@ function extractTarXZ(filePath, extractToPath, version) {
                     clearInterval(interval);
                     readline.cursorTo(process.stdout, 0);
                     process.stdout.write(`${res}\n`);
+
                 })
 
             }).catch(err => {
@@ -237,14 +209,14 @@ async function downloadAndUnzip(url, filePath, outputDir, version) {
     }
 }
 
+
+
+
 function setup() {
 
     return new Promise((res, rej) => {
         try {
-            const setx = spawn(`setx`, [`N_HOME`, `${DIR_PATH_HOME_DOT_N_FOLDER}`], {
-                stdio: ['pipe', 'pipe', process.stderr],
-                shell: true
-            });
+
 
             const script_bin_sh_n = binScripts('sh')
             const script_bin_pwsh_n = binScripts('pwsh')
@@ -253,19 +225,55 @@ function setup() {
             fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\n`, script_bin_sh_n)
             fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\n.ps1`, script_bin_pwsh_n)
             fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\n.cmd`, script_bin_cmd_n)
+            fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\setup.cmd`, `@echo off
+for /f "skip=2 tokens=2,*" %%A in ('reg query "HKLM\\System\\CurrentControlSet\\Control\\Session Manager\\Environment" /v Path 2^>nul') do (
+  setx PATH "%%B;%%N_HOME%%;%%N_SYMLINK%%"
+)
+@echo on
 
+`)
 
-            setx.on('close', (code) => {
-                setupProject().then(() => {
+            const setupInstall = spawn(`${DIR_PATH_HOME_DOT_N_FOLDER}\\setup.cmd`, {
+                stdio: ['pipe', 'pipe', process.stderr],
+                shell: true
+            });
+            setupInstall.on('close', (code) => {
+                const initPkg = spawn(DIR_PATH_HOME_NPM, ['init', '-y'], {
+                    cwd: DIR_PATH_HOME_DOT_N_FOLDER,
+                    stdio: ['pipe', 'pipe', process.stderr],
+                    shell: true
+                });
+                initPkg.on('close', (code) => {
 
-                    res("Done!")
-                })
+                    const installPkg = spawn(DIR_PATH_HOME_NPM, ['install', '@idev-coder/n'], {
+                        cwd: DIR_PATH_HOME_DOT_N_FOLDER,
+                        stdio: ['pipe', 'pipe', process.stderr],
+                        shell: true
+                    });
+                    installPkg.on('close', (code) => {
+                        const setx = spawn(`setx`, [`N_HOME`, `${DIR_PATH_HOME_DOT_N_FOLDER}`], {
+                            stdio: ['pipe', 'pipe', process.stderr],
+                            shell: true
+                        });
+                        setx.on('close', (code) => {
+                            const setx_n_link = spawn(`setx`, [`N_SYMLINK`, `${DIR_PATH_HOME_BIN}`], {
+                                stdio: ['pipe', 'pipe', process.stderr],
+                                shell: true
+                            });
+
+                            setx_n_link.on('close', (code) => {
+
+                                res("Done!")
+                            })
+
+                        });
+                    });
+                });
             });
 
         } catch (err) {
             rej(err)
         }
-
 
     })
 

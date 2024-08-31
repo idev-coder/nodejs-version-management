@@ -283,105 +283,78 @@ function binScripts(type) {
 
     if (type === "sh") {
         return `#!/usr/bin/env bash
-  
-  # กำหนดตำแหน่งของไฟล์ node
-  NODE_EXE="$PWD/bin/node.exe"
-  
-  # ตรวจสอบว่าไฟล์ที่กำหนดมีอยู่หรือไม่
-  if [ ! -f "$NODE_EXE" ]; then
-    NODE_EXE="$PWD/bin/node"
-  fi
-  if [ ! -f "$NODE_EXE" ]; then
+
+# Define the node executable
+NODE_EXE="$BASH_SOURCE_DIR/bin/node"
+
+# Check if node.exe exists, otherwise use node
+if [[ ! -x "$NODE_EXE" ]]; then
+    NODE_EXE="$BASH_SOURCE_DIR/bin/node"
+fi
+if [[ ! -x "$NODE_EXE" ]]; then
     NODE_EXE="node"
-  fi
-  
-  # กำหนดตำแหน่งของ n-cli.js
-  N_CLI_JS="$PWD/node_modules/@idev-coder/n/bin/n-cli.js"
-  
-  # รัน node กับ n-cli.js และเก็บผลลัพธ์
-  N_BIN=$("$NODE_EXE" "$N_CLI_JS" "$@")
-  
-  if [ -n "$N_BIN" ]; then
-      # แยกผลลัพธ์โดยใช้เว้นวรรค
-      IFS=' ' read -r -a array <<< "$N_BIN"
-      cmd=${"${array[0]}"}
-      args=${"${array[@]:1}"
-            }
-      case "$cmd" in
-          *node*)
-              "$cmd" $args
-              ;;
-          *npm*)
-              "$cmd" $args
-              ;;
-          *npx*)
-              "$cmd" $args
-              ;;
-          *)
-              echo "$N_BIN"
-              ;;
-      esac
-  else
-      # ถ้า $N_BIN ไม่มีค่า
-      N_V=$("$NODE_EXE" "$N_CLI_JS" "-v")
-      NODE_V=$(node -v)
-      NPM_V=$(npm -v)
-      NPX_V=$(npx -v)
-  
-      echo "n $N_V"
-      echo "node $NODE_V"
-      echo "npm v$NPM_V"
-      echo "npx v$NPX_V"
-  fi
+fi
+
+# Define the n-cli.js script
+N_CLI_JS="$BASH_SOURCE_DIR/node_modules/@idev-coder/n/bin/n-cli.js"
+
+# Run the command
+N_BIN=$("$NODE_EXE" "$N_CLI_JS" "$@")
+
+# Check if N_BIN is set and not empty
+if [[ -n "$N_BIN" ]]; then
+    eval "$N_BIN"
+else
+    # Get version information
+    N_V=$("$NODE_EXE" "$N_CLI_JS" -v)
+    NODE_V=$(node -v)
+    NPM_V=$(npm -v)
+    NPX_V=$(npx -v)
+    
+    # Print version information
+    echo "n $N_V"
+    echo "node $NODE_V"
+    echo "npm v$NPM_V"
+    echo "npx v$NPX_V"
+fi
   `
     } else if (type === "cmd") {
         return `@echo off
-  setlocal
-  
-  rem กำหนดตำแหน่งของไฟล์ node
-  set "NODE_EXE=%~dp0\\bin\\node.exe"
-  
-  rem ตรวจสอบว่าไฟล์ที่กำหนดมีอยู่หรือไม่
-  if not exist "%NODE_EXE%" set "NODE_EXE=%~dp0\\bin\\node"
-  if not exist "%NODE_EXE%" set "NODE_EXE=node"
-  
-  rem กำหนดตำแหน่งของ n-cli.js
-  set "N_CLI_JS=%~dp0\\node_modules\\@idev-coder\\n\\bin\\n-cli.js"
-  
-  rem รัน node กับ n-cli.js และเก็บผลลัพธ์
-  for /f "delims=" %%i in ('"%NODE_EXE%" "%N_CLI_JS%" %*') do set "N_BIN=%%i"
-  
-  if defined N_BIN (
-      rem แยกผลลัพธ์โดยใช้เว้นวรรค
-      for /f "tokens=1,* delims= " %%a in ("%N_BIN%") do (
-          set "cmd=%%a"
-          set "args=%%b"
-      )
-  
-      rem รันคำสั่งที่เกี่ยวข้อง
-      if "%cmd%"=="node" (
-          %cmd% %args%
-      ) else if "%cmd%"=="npm" (
-          %cmd% %args%
-      ) else if "%cmd%"=="npx" (
-          %cmd% %args%
-      ) else (
-          echo %N_BIN%
-      )
-  ) else (
-      rem ถ้า %N_BIN% ไม่มีค่า
-      for /f "delims=" %%v in ('"%NODE_EXE%" "%N_CLI_JS%" -v') do set "N_V=%%v"
-      for /f "delims=" %%v in ('node -v') do set "NODE_V=%%v"
-      for /f "delims=" %%v in ('npm -v') do set "NPM_V=%%v"
-      for /f "delims=" %%v in ('npx -v') do set "NPX_V=%%v"
-      
-      echo n %N_V%
-      echo node %NODE_V%
-      echo npm v%NPM_V%
-      echo npx v%NPX_V%
-  )
-  
-  endlocal
+setlocal
+
+set "NODE_EXE=%~dp0\\bin\\node.exe"
+
+if not exist "%NODE_EXE%" (
+    set "NODE_EXE=%~dp0\\bin\\node"
+)
+if not exist "%NODE_EXE%" (
+    set "NODE_EXE=node"
+)
+
+set "N_CLI_JS=%~dp0\\node_modules\\@idev-coder\\n\\bin\\n-cli.js"
+
+:: Prepare arguments
+set "ARGS=%*"
+
+:: Run the command
+for /f "delims=" %%i in ('"%NODE_EXE%" "%N_CLI_JS%" %ARGS%') do set "N_BIN=%%i"
+
+if defined N_BIN (
+    echo %N_BIN%
+    call %N_BIN%
+) else (
+    for /f "delims=" %%v in ('"%NODE_EXE%" "%N_CLI_JS%" -v') do set "N_V=%%v"
+    for /f "delims=" %%v in ('node -v') do set "NODE_V=%%v"
+    for /f "delims=" %%v in ('npm -v') do set "NPM_V=%%v"
+    for /f "delims=" %%v in ('npx -v') do set "NPX_V=%%v"
+    
+    echo n %N_V%
+    echo node %NODE_V%
+    echo npm v%NPM_V%
+    echo npx v%NPX_V%
+)
+
+endlocal
   `
     } else if (type === "pwsh") {
         return `#!/usr/bin/env pwsh
@@ -399,22 +372,7 @@ function binScripts(type) {
   $N_BIN = & $NODE_EXE $N_CLI_JS $args
   
   if($N_BIN) {
-      $array = $N_BIN -split " "
-      if($array[0] -like "*node*") {
-          $NODE_ARGS = $array[1..($array.Length - 1)]
-          $BIN_NODE = $array[0]
-          & $BIN_NODE $NODE_ARGS
-      }elseif($array[0] -like "*npm*") {
-          $NPM_ARGS = $array[1..($array.Length - 1)]
-          $BIN_NPM = $array[0]
-          & $BIN_NPM $NPM_ARGS
-      }elseif($array[0] -like "*npx*") {
-          $NPX_ARGS = $array[1..($array.Length - 1)]
-          $BIN_NPX = $array[0]
-          & $BIN_NPX $NPX_ARGS
-      }else {
-          Write-Output $N_BIN
-      }
+      Invoke-Expression $N_BIN
   }else {
       $N_V = & $NODE_EXE $N_CLI_JS "-v"
       $NODE_V = & "node" "-v"

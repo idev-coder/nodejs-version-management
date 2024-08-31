@@ -285,25 +285,32 @@ function binScripts(type) {
         return `#!/usr/bin/env bash
 
 # Define the node executable
-NODE_EXE="$BASH_SOURCE_DIR/bin/node"
+NODE_EXE="$(dirname "$0")/bin/node"
 
 # Check if node.exe exists, otherwise use node
 if [[ ! -x "$NODE_EXE" ]]; then
-    NODE_EXE="$BASH_SOURCE_DIR/bin/node"
+    NODE_EXE="$(dirname "$0")/bin/node"
 fi
 if [[ ! -x "$NODE_EXE" ]]; then
     NODE_EXE="node"
 fi
 
 # Define the n-cli.js script
-N_CLI_JS="$BASH_SOURCE_DIR/node_modules/@idev-coder/n/bin/n-cli.js"
+N_CLI_JS="$(dirname "$0")/node_modules/@idev-coder/n/bin/n-cli.js"
 
-# Run the command
+# Run the command and capture output
 N_BIN=$("$NODE_EXE" "$N_CLI_JS" "$@")
 
 # Check if N_BIN is set and not empty
 if [[ -n "$N_BIN" ]]; then
-    eval "$N_BIN"
+    # Split N_BIN by space and check the command
+    CMD=$(echo "$N_BIN" | awk '{print $1}')
+    
+    if [[ "$CMD" == "node" || "$CMD" == "npm" || "$CMD" == "npx" ]]; then
+        eval "$N_BIN"
+    else
+        echo "$N_BIN"
+    fi
 else
     # Get version information
     N_V=$("$NODE_EXE" "$N_CLI_JS" -v)
@@ -322,8 +329,10 @@ fi
         return `@echo off
 setlocal
 
+:: Define the node executable
 set "NODE_EXE=%~dp0\\bin\\node.exe"
 
+:: Check if node.exe exists, otherwise use node
 if not exist "%NODE_EXE%" (
     set "NODE_EXE=%~dp0\\bin\\node"
 )
@@ -331,23 +340,35 @@ if not exist "%NODE_EXE%" (
     set "NODE_EXE=node"
 )
 
+:: Define the n-cli.js script
 set "N_CLI_JS=%~dp0\\node_modules\\@idev-coder\\n\\bin\\n-cli.js"
 
-:: Prepare arguments
-set "ARGS=%*"
-
 :: Run the command
-for /f "delims=" %%i in ('"%NODE_EXE%" "%N_CLI_JS%" %ARGS%') do set "N_BIN=%%i"
+set "N_BIN="
+for /f "delims=" %%i in ('"%NODE_EXE%" "%N_CLI_JS%" %*') do set "N_BIN=%%i"
 
+:: Check if N_BIN is set and not empty
 if defined N_BIN (
-    echo %N_BIN%
-    call %N_BIN%
+    :: Split N_BIN by space and check the command
+    for /f "tokens=1" %%a in ("%N_BIN%") do set "CMD=%%a"
+
+    if "%CMD%"=="node" (
+        call %N_BIN%
+    ) else if "%CMD%"=="npm" (
+        call %N_BIN%
+    ) else if "%CMD%"=="npx" (
+        call %N_BIN%
+    ) else (
+        echo %N_BIN%
+    )
 ) else (
+    :: Get version information
     for /f "delims=" %%v in ('"%NODE_EXE%" "%N_CLI_JS%" -v') do set "N_V=%%v"
     for /f "delims=" %%v in ('node -v') do set "NODE_V=%%v"
     for /f "delims=" %%v in ('npm -v') do set "NPM_V=%%v"
     for /f "delims=" %%v in ('npx -v') do set "NPX_V=%%v"
     
+    :: Print version information
     echo n %N_V%
     echo node %NODE_V%
     echo npm v%NPM_V%
@@ -372,7 +393,17 @@ endlocal
   $N_BIN = & $NODE_EXE $N_CLI_JS $args
   
   if($N_BIN) {
-      Invoke-Expression $N_BIN
+      
+      $array = $N_BIN -split " "
+      if($array[0] -eq "node") {
+          Invoke-Expression $N_BIN
+      }elseif($array[0] -eq "npm") {
+          Invoke-Expression $N_BIN
+      }elseif($array[0] -eq "npx") {
+          Invoke-Expression $N_BIN
+      }else {
+          Write-Output $N_BIN
+      }
   }else {
       $N_V = & $NODE_EXE $N_CLI_JS "-v"
       $NODE_V = & "node" "-v"

@@ -160,6 +160,8 @@ All commands:
   profile: profile
   prune: prune
   publish: publish
+  setup: setup
+  set-tool=<tool>: tool = <npm, pnpm, yarn, bun> 
 
 Versions:
 

@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import { DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_SETTING_FILE, DIR_PATH_HOME_FOLDER, MSG_NODE_NOT_VERSION_TYPE, MSG_NODE_VERSION_NOT_FOULT } from "./common";
-import { updateNodeVersion } from "./update";
+import { updateEnvironmentVariables, updateNodeVersion } from "./update";
 import { nodeOnlineVersion } from "./node-version";
 import { options } from "./options";
 import { n } from "./n";
@@ -11,53 +11,79 @@ export async function commands(keys: any[]) {
 
     try {
         var option = await nodeOnlineVersion(keys[0])
-
+        let settingStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE)
+        let version: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
         if (keys[0]) {
             if (option.data.length > 0) {
                 if (option.data.length === 1) {
                     if (await updateNodeVersion(option.message)) {
-                        let settingStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE)
-                        let nrcStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
+
                         let { engine } = JSON.parse(settingStr)
 
-                        process.stdout.write(`[✓] ${engine} > ${nrcStr}\n`);
+                        process.stdout.write(`[✓] ${engine} > ${version}\n`);
                         process.exit(0);
                     }
                 } else {
-                    console.log(option.message);
+                    process.stdout.write(`${option.message}\n`);
                     process.exit(0);
                 }
             } else if (option.message === MSG_NODE_VERSION_NOT_FOULT) {
-                console.log(option.message);
+                process.stdout.write(`${option.message}\n`);
+                process.exit(0);
             } else if (option.message === MSG_NODE_NOT_VERSION_TYPE) {
 
                 let option = await options(keys[0])
                 if (option) {
                     let cmd: any[] = option.split(" ")
                     const [tool, ...opts] = cmd
-             
-                    const child = spawn(`${tool}`, opts, {
-                        stdio: ['pipe', 'pipe', process.stderr],
-                        shell: true
-                    });
 
-                    child.stdout.on('data', (data) => {
-                        process.stdout.write(data);
-                    });
+                    if ((opts.includes('install') || opts.includes('add')) && (opts.includes('-g') || opts.includes('global'))) {
+                        let child = spawn(`${tool}`, opts, {
+                            stdio: ['pipe', 'pipe', process.stderr],
+                            shell: true
+                        });
 
-                    child.on('error', (error: any) => {
-                        process.stdout.write(error);
-                    });
+                        child.stdout.on('data', (data) => {
+                            process.stdout.write(data);
+                        });
 
-                    child.on('close', (code) => {
-                        console.log(`child process exited with code ${code}`);
+                        child.on('error', (error: any) => {
+                            process.stdout.write(error);
+                        });
+
+                        child.on('close', (code) => {
+                            updateEnvironmentVariables(version)
+                            process.exit(0);
+                        });
+                    } else if (option === version) {
+                        process.stdout.write(`${option}\n`);
                         process.exit(0);
-                    });
+                    } else {
+                        let child = spawn(`${tool}`, opts, {
+                            stdio: ['pipe', 'pipe', process.stderr],
+                            shell: true
+                        });
+
+                        child.stdout.on('data', (data) => {
+                            process.stdout.write(data);
+                        });
+
+                        child.on('error', (error: any) => {
+                            process.stdout.write(error);
+                        });
+
+                        child.on('close', (code) => {
+                            process.exit(0);
+                        });
+                    }
 
                 } else {
                     let nStr = await n(keys)
-                    console.log(nStr);
-                    process.exit(0);
+                    if (nStr) {
+                        process.stdout.write(nStr);
+                        process.exit(0);
+                    }
+
 
                 }
 

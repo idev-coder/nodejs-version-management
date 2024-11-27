@@ -1,6 +1,6 @@
 {
   "name": "@idev-coder/n",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "main": "lib/cli.js",
   "homepage": "https://idev-coder.github.io/nodejs-version-management/",
   "bugs": {
@@ -19,7 +19,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "dev": "ts-node ./src/cli.ts",
-    "build:pkg:setup": "pkg -t node18-win bin/setup.js -o build/Setup.exe"
+    "build:pkg:setup": "pkg -t node18-win bin/n-cli.cjs -o build/Setup.exe"
   },
   "preferGlobal": true,
   "keywords": [
@@ -32,7 +32,8 @@
     "yarn",
     "pnpm",
     "bun",
-    "typescript"
+    "typescript",
+    "deno"
   ],
   "repository": {
     "type": "git",

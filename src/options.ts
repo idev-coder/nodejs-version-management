@@ -35,7 +35,7 @@ export async function options(key: string) {
 
                 } else {
                     if (['-g', '-G', 'global', '--global'].includes(option)) {
-                        let installGlobal = tool === 'yarn' ? 'global' : 'g'
+                        let installGlobal = tool === 'yarn' ? 'global' : '-g'
                         return bin(tool, [optionName, installGlobal, ...opts])
                     } else if (['-w', '-W', '--workspace', 'workspace'].includes(option)) {
                         let installWorkspace = tool === 'yarn' ? 'workspace' : '--workspace'
@@ -123,7 +123,7 @@ export async function options(key: string) {
 
                 } else {
                     if (['-g', '-G', 'global', '--global'].includes(option)) {
-                        let installGlobal = tool === 'yarn' ? 'global' : 'g'
+                        let installGlobal = tool === 'yarn' ? 'global' : '-g'
                         return bin(tool, [optionName, installGlobal, ...opts])
                     } else if (['-w', '-W', '--workspace', 'workspace'].includes(option)) {
                         let installWorkspace = tool === 'yarn' ? 'workspace' : '--workspace'
@@ -161,7 +161,7 @@ export async function options(key: string) {
                 return `[✓] Setup\n`
             }
 
-        } else if (['set-tool=npm', 'set-tool=yarn', 'set-tool=pnpm'].includes(key)) {
+        } else if (['set-tool=npm', 'set-tool=yarn', 'set-tool=pnpm', 'set-tool=bun'].includes(key)) {
             let val = await setTool(key)
             if (val) {
                 return `[✓] Tool\n`

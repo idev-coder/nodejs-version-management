@@ -1,9 +1,12 @@
 
-export function help() {
+/**
+ * Returns usage instructions and available commands for the Node.js version management tool `n`.
+ */
+export function help(): string {
     return `
 Usage: n [options] [COMMAND] [args]
 
-Usage:
+Commands:
 
   n                              Display downloaded Node.js versions and install selection
   n [args ...]                   Execute with [args ...]
@@ -24,8 +27,8 @@ Usage:
 
 Options:
 
-  -v, -V, -version, --version         Output version of n
-  -h, -H, --help                      Display help information
+  -v, -V, -version, --version    Output version of n
+  -h, -H, --help                 Display help information
 
 All commands:
 
@@ -52,7 +55,7 @@ All commands:
   deprecate: deprecate
   diff: diff
   dist-tag: dt, dist-tag
-  docs: docs,
+  docs: docs
   doctor: doctor
   edit: edit
   exec: exec
@@ -109,5 +112,5 @@ Versions:
     lts               Newest Long Term Support official release
     latest            Newest official release
     boron, carbon     Codenames for release streams
-   `
+   `;
 }

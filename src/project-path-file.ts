@@ -5,10 +5,14 @@ const appDirectory = fs.realpathSync(process.cwd());
 
 const resolveApp = (relativePath: string) => path.resolve(appDirectory, relativePath);
 
-const resolveModule = (resolveFn: any, filePath: string) => {
-    return resolveFn(`${filePath}`);
-};
+const resolveModule = (resolveFn: (path: string) => any, filePath: string): any => resolveFn(filePath);
 
-export function projectPathFile(fileName: string) {
-    return resolveModule(resolveApp, fileName)
+/**
+ * Resolves the path of a given file within the project.
+ * 
+ * @param fileName - The name of the file to resolve.
+ * @returns The resolved path of the specified file.
+ */
+export function projectPathFile(fileName: string): string {
+    return resolveModule(resolveApp, fileName);
 }

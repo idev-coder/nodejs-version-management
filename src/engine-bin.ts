@@ -1,58 +1,29 @@
-import * as os from 'os'
+import * as os from 'os';
 
-export function engineNodeBin() {
-    switch (os.platform()) {
-        case "win32":
-            return "node.exe"
-            break;
-        case "linux":
-        case "darwin":
-        case "aix":
-        case "freebsd":
-        case "openbsd":
-        case "sunos":
-            return "bin/node"
-            break;
-        default:
-            return "bin/node"
-            break;
+/**
+ * Determines the appropriate path or filename for the Node.js binary
+ * based on the operating system platform.
+ * 
+ * @returns {string} The Node.js binary path or filename.
+ */
+export function engineNodeBin(): string {
+    const platform = os.platform();
+    if (platform === "win32") {
+        return "node.exe";
     }
+    return "bin/node";
 }
 
-export function engineNPMBin() {
-    switch (os.platform()) {
-        case "win32":
-            return "npm"
-            break;
-        case "linux":
-        case "darwin":
-        case "aix":
-        case "freebsd":
-        case "openbsd":
-        case "sunos":
-            return "bin/npm"
-            break;
-        default:
-            return "bin/npm"
-            break;
-    }
+export function engineNPMBin(): string {
+    const platform = os.platform();
+    return platform === "win32" ? "npm" : "bin/npm";
 }
 
-export function engineNPXBin() {
-    switch (os.platform()) {
-        case "win32":
-            return "npx"
-            break;
-        case "linux":
-        case "darwin":
-        case "aix":
-        case "freebsd":
-        case "openbsd":
-        case "sunos":
-            return "bin/npx"
-            break;
-        default:
-            return "bin/npx"
-            break;
-    }
+/**
+ * Determines the appropriate path to the `npx` binary based on the operating system platform.
+ * @returns {string} The path to the `npx` binary.
+ */
+export function engineNPXBin(): string {
+    const platform = os.platform();
+    return platform === "win32" ? "npx" : "bin/npx";
 }

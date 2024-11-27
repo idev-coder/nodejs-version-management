@@ -15,52 +15,52 @@ const DIR_PATH_HOME_BIN = path.join(DIR_PATH_HOME_DOT_N_FOLDER, "bin");
 const DIR_PATH_HOME_NPM = path.join(DIR_PATH_HOME_BIN, "npm");
 
 async function install() {
-    const url = `https://nodejs.org/download/release/${version}/node-${version}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`
+    const url = `https://nodejs.org/download/release/${version}/node-${version}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`;
     const filePath = path.basename(url);
     const outputDir = path.join(DIR_PATH_HOME_DOT_N_FOLDER, version);
     const outputDownloadDir = path.join(DIR_PATH_HOME_DOT_N_FOLDER, filePath);
 
-    let statusDirVersion = await validateDirVersion(DIR_PATH_HOME_DOT_N_FOLDER)
+    const statusDirVersion = await validateDirVersion(DIR_PATH_HOME_DOT_N_FOLDER);
     if (statusDirVersion) {
-        let statusOutputDir = await validateDirVersion(outputDir)
+        const statusOutputDir = await validateDirVersion(outputDir);
         if (!statusOutputDir) {
-            downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_FOLDER, version)
+            await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_FOLDER, version);
         }
     } else {
-        let status
-        status = await setupFloderDotN(DIR_PATH_HOME_DOT_N_FOLDER)
-
+        const status = await setupFloderDotN(DIR_PATH_HOME_DOT_N_FOLDER);
         if (status) {
-
-            downloadAndUnzip(url, filePath, DIR_PATH_HOME_DOT_N_FOLDER, version)
-
+            await downloadAndUnzip(url, filePath, DIR_PATH_HOME_DOT_N_FOLDER, version);
         }
     }
 }
 
+/**
+ * Asynchronously creates a directory at the specified path.
+ * @param {string} pathName - The path where the directory should be created.
+ * @returns {Promise<boolean>} - Resolves to true if the directory is created successfully, otherwise false.
+ */
 async function setupFloderDotN(pathName) {
     try {
         fs.mkdirSync(pathName, { recursive: true });
-        return true
-    } catch (err) {
-        return false
+        return true;
+    } catch {
+        return false;
     }
 }
 
+/**
+ * Validates if a directory can be read successfully.
+ * @param {string} directoryPathName - The path to the directory to be validated.
+ * @returns {Promise<boolean>} - Returns true if the directory is read successfully, false if an error occurs.
+ */
 async function validateDirVersion(directoryPathName) {
     try {
         const files = fs.readdirSync(directoryPathName, { withFileTypes: true });
-        files.forEach((file) => {
-            if (file.isDirectory()) {
-            }
-        });
-
-        return true
-
+        files.some(file => file.isDirectory()); // Check for directories, but no action needed
+        return true;
     } catch (err) {
-        return false
+        return false;
     }
-
 }
 
 const spinnerFrames = ['|', '/', '-', '\\'];
@@ -74,53 +74,37 @@ function showSpinner() {
 
 // ฟังก์ชันสำหรับดาวน์โหลดไฟล์พร้อมแสดงเปอร์เซ็นต์การโหลด
 async function downloadFile(url, outputLocationPath) {
-    return new Promise((res, rej) => {
+    return new Promise((resolve, reject) => {
         const fileStream = fs.createWriteStream(outputLocationPath);
         const interval = setInterval(showSpinner, 100); // Adjust speed here
-        // Create a progress stream
+
         const progress = progressStream({
             length: 0, // Placeholder for total length
             time: 1000  // Update progress every second
         });
 
-        // Handle progress events
-
-
         https.get(url, (response) => {
-            // Set the length of the progress stream to the size of the file (if known)
             progress.length = parseInt(response.headers['content-length'] || '0', 10);
-
             response.pipe(progress).pipe(fileStream);
 
             fileStream.on('finish', () => {
                 clearInterval(interval);
                 readline.cursorTo(process.stdout, 0);
-                fileStream.close(() => {
-                    res(100)
-                    // if (cb) cb(undefined, 100); // Call callback with 100% progress when done
-                });
+                fileStream.close(() => resolve(100));
             });
-        }).on('error', (err) => { // Handle errors
+        }).on('error', (err) => {
             fs.unlinkSync(outputLocationPath); // Delete the file if there's an error
-            // if (cb) cb(err.message);
-            rej(err)
+            reject(err);
         });
-    })
+    });
 }
 
 // ฟังก์ชันสำหรับแตกไฟล์
 
 function tryDeleteFile(filePath, retries = 5, delay = 1000) {
     fs.unlink(filePath, (err) => {
-        if (err) {
-            if (retries > 0 && err.code === 'EBUSY') {
-                // console.log('File is busy, retrying...');
-                setTimeout(() => tryDeleteFile(filePath, retries - 1, delay), delay);
-            } else {
-                // console.error('Error removing file:', err);
-            }
-        } else {
-            // console.log('File removed successfully.');
+        if (err && retries > 0 && err.code === 'EBUSY') {
+            setTimeout(() => tryDeleteFile(filePath, retries - 1, delay), delay);
         }
     });
 }
@@ -128,68 +112,54 @@ function tryDeleteFile(filePath, retries = 5, delay = 1000) {
 function tryRename(oldPath, newPath, retries = 5, delay = 1000) {
     fs.rename(oldPath, newPath, (err) => {
         if (err) {
-            if (retries > 0 && (err.code === 'EPERM' || err.code === 'EBUSY')) {
-                // console.log('File is busy or permission error, retrying...');
+            if (retries > 0 && ['EPERM', 'EBUSY'].includes(err.code)) {
                 setTimeout(() => tryRename(oldPath, newPath, retries - 1, delay), delay);
             } else {
-                // console.error('Error renaming file:', err);
+                console.error('Error renaming file:', err);
             }
         } else {
-            // console.log('File renamed successfully.');
+            console.log('File renamed successfully.');
         }
     });
 }
 
 function extractTarXZ(filePath, extractToPath, version) {
-
-
     const interval = setInterval(showSpinner, 100); // Adjust speed here
 
-    if (fs.existsSync(filePath)) {
-        const ls = spawn(`tar`, ['-xf', filePath, '-C', extractToPath], {
-            stdio: ['pipe', 'pipe', process.stderr],
-            shell: true
-        });
-
-        ls.stdout.on('data', (data) => {
-            // console.log(data);
-            process.stdout.write(`${data}`);
-        })
-        ls.on('close', (code) => {
-            // process.stdout.write(`child process close all stdio with code ${code}`);
-            const oldPath = path.join(extractToPath, `node-${version}-${platform}-${arch}`);
-            const newPath = path.join(extractToPath, `bin`);
-            tryDeleteFile(filePath)
-            tryRename(oldPath, newPath)
-
-
-            validateDirVersion(DIR_PATH_HOME_BIN).then(res => {
-                // process.stdout.write('Done!\n');
-                setup().then(res => {
-                    clearInterval(interval);
-                    readline.cursorTo(process.stdout, 0);
-                    process.stdout.write(`${res}\n`);
-
-                })
-
-            }).catch(err => {
-                process.stdout.write(err);
-            })
-
-
-        });
-
-        ls.on('exit', (code) => {
-            // process.stdout.write(`child process exited with code ${code}`);
-
-        });
-
-
-
-    } else {
+    if (!fs.existsSync(filePath)) {
         console.error('ไม่พบ:', filePath);
+        return;
     }
-    ;
+
+    const ls = spawn('tar', ['-xf', filePath, '-C', extractToPath], {
+        stdio: ['pipe', 'pipe', process.stderr],
+        shell: true
+    });
+
+    ls.stdout.on('data', (data) => {
+        process.stdout.write(`${data}`);
+    });
+
+    ls.on('close', async (code) => {
+        const oldPath = path.join(extractToPath, `node-${version}-${platform}-${arch}`);
+        const newPath = path.join(extractToPath, 'bin');
+        tryDeleteFile(filePath);
+        tryRename(oldPath, newPath);
+
+        try {
+            const res = await validateDirVersion(DIR_PATH_HOME_BIN);
+            const setupRes = await setup();
+            clearInterval(interval);
+            readline.cursorTo(process.stdout, 0);
+            process.stdout.write(`${setupRes}\n`);
+        } catch (err) {
+            process.stdout.write(err);
+        }
+    });
+
+    ls.on('exit', (code) => {
+        // process.stdout.write(`child process exited with code ${code}`);
+    });
 }
 
 // ดาวน์โหลดและแตกไฟล์
@@ -200,12 +170,12 @@ async function downloadAndUnzip(url, filePath, outputDir, version) {
         const res = await downloadFile(url, filePath);
 
         if (res === 100) {
-            extractTarXZ(filePath, outputDir, version);
+            await extractTarXZ(filePath, outputDir, version);
         }
 
     } catch (error) {
         console.error('เกิดข้อผิดพลาด:', error);
-        return false
+        return false;
     }
 }
 
@@ -213,84 +183,73 @@ async function downloadAndUnzip(url, filePath, outputDir, version) {
 
 
 function setup() {
-
     return new Promise((res, rej) => {
         try {
+            const scripts = {
+                sh: binScripts('sh'),
+                pwsh: binScripts('pwsh'),
+                cmd: binScripts('cmd')
+            };
 
+            const filePaths = {
+                n: `${DIR_PATH_HOME_DOT_N_FOLDER}\\n`,
+                nPs1: `${DIR_PATH_HOME_DOT_N_FOLDER}\\n.ps1`,
+                nCmd: `${DIR_PATH_HOME_DOT_N_FOLDER}\\n.cmd`,
+                setupCmd: `${DIR_PATH_HOME_DOT_N_FOLDER}\\setup.cmd`
+            };
 
-            const script_bin_sh_n = binScripts('sh')
-            const script_bin_pwsh_n = binScripts('pwsh')
-            const script_bin_cmd_n = binScripts('cmd')
-
-            fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\n`, script_bin_sh_n)
-            fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\n.ps1`, script_bin_pwsh_n)
-            fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\n.cmd`, script_bin_cmd_n)
-            fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\setup.cmd`, `@echo off
+            fs.writeFileSync(filePaths.n, scripts.sh);
+            fs.writeFileSync(filePaths.nPs1, scripts.pwsh);
+            fs.writeFileSync(filePaths.nCmd, scripts.cmd);
+            fs.writeFileSync(filePaths.setupCmd, `@echo off
 for /f "skip=2 tokens=2,*" %%A in ('reg query "HKLM\\System\\CurrentControlSet\\Control\\Session Manager\\Environment" /v Path 2^>nul') do (
   setx PATH "%%B;%%N_HOME%%;%%N_SYMLINK%%"
 )
 @echo on
+`);
 
-`)
-
-            const setupInstall = spawn(`${DIR_PATH_HOME_DOT_N_FOLDER}\\setup.cmd`, {
+            const spawnOptions = {
                 stdio: ['pipe', 'pipe', process.stderr],
                 shell: true
-            });
-            setupInstall.on('close', (code) => {
+            };
+
+            const setupInstall = spawn(filePaths.setupCmd, spawnOptions);
+            setupInstall.on('close', () => {
                 const initPkg = spawn(DIR_PATH_HOME_NPM, ['init', '-y'], {
-                    cwd: DIR_PATH_HOME_DOT_N_FOLDER,
-                    stdio: ['pipe', 'pipe', process.stderr],
-                    shell: true
+                    ...spawnOptions,
+                    cwd: DIR_PATH_HOME_DOT_N_FOLDER
                 });
-                initPkg.on('close', (code) => {
 
+                initPkg.on('close', () => {
                     const installPkg = spawn(DIR_PATH_HOME_NPM, ['install', '@idev-coder/n'], {
-                        cwd: DIR_PATH_HOME_DOT_N_FOLDER,
-                        stdio: ['pipe', 'pipe', process.stderr],
-                        shell: true
+                        ...spawnOptions,
+                        cwd: DIR_PATH_HOME_DOT_N_FOLDER
                     });
-                    installPkg.on('close', (code) => {
-                        const setx = spawn(`setx`, [`N_HOME`, `${DIR_PATH_HOME_DOT_N_FOLDER}`], {
-                            stdio: ['pipe', 'pipe', process.stderr],
-                            shell: true
-                        });
-                        setx.on('close', (code) => {
-                            const setx_n_link = spawn(`setx`, [`N_SYMLINK`, `${DIR_PATH_HOME_BIN}`], {
-                                stdio: ['pipe', 'pipe', process.stderr],
-                                shell: true
-                            });
 
-                            setx_n_link.on('close', (code) => {
-
-                                res("Done!")
-                            })
-
+                    installPkg.on('close', () => {
+                        const setx = spawn('setx', ['N_HOME', DIR_PATH_HOME_DOT_N_FOLDER], spawnOptions);
+                        setx.on('close', () => {
+                            const setx_n_link = spawn('setx', ['N_SYMLINK', DIR_PATH_HOME_BIN], spawnOptions);
+                            setx_n_link.on('close', () => res("Done!"));
                         });
                     });
                 });
             });
 
         } catch (err) {
-            rej(err)
+            rej(err);
         }
-
-    })
-
+    });
 }
 
 function binScripts(type) {
-
-    if (type === "sh") {
-        return `#!/usr/bin/env bash
+    const scripts = {
+        sh: `#!/usr/bin/env bash
 
 # Define the node executable
 NODE_EXE="$(dirname "$0")/bin/node"
 
 # Check if node.exe exists, otherwise use node
-if [[ ! -x "$NODE_EXE" ]]; then
-    NODE_EXE="$(dirname "$0")/bin/node"
-fi
 if [[ ! -x "$NODE_EXE" ]]; then
     NODE_EXE="node"
 fi
@@ -324,18 +283,14 @@ else
     echo "npm v$NPM_V"
     echo "npx v$NPX_V"
 fi
-  `
-    } else if (type === "cmd") {
-        return `@echo off
+`,
+        cmd: `@echo off
 setlocal
 
 :: Define the node executable
 set "NODE_EXE=%~dp0\\bin\\node.exe"
 
 :: Check if node.exe exists, otherwise use node
-if not exist "%NODE_EXE%" (
-    set "NODE_EXE=%~dp0\\bin\\node"
-)
 if not exist "%NODE_EXE%" (
     set "NODE_EXE=node"
 )
@@ -376,47 +331,39 @@ if defined N_BIN (
 )
 
 endlocal
-  `
-    } else if (type === "pwsh") {
-        return `#!/usr/bin/env pwsh
-  $NODE_EXE="$PSScriptRoot/bin/node.exe"
-  
-  if (-not (Test-Path $NODE_EXE)) {
-    $NODE_EXE="$PSScriptRoot/bin/node"
-  }
-  if (-not (Test-Path $NODE_EXE)) {
+`,
+        pwsh: `#!/usr/bin/env pwsh
+$NODE_EXE="$PSScriptRoot/bin/node.exe"
+
+if (-not (Test-Path $NODE_EXE)) {
     $NODE_EXE="node"
-  }
-  
-  $N_CLI_JS="$PSScriptRoot/node_modules/@idev-coder/n/bin/n-cli.js"
-  
-  $N_BIN = & $NODE_EXE $N_CLI_JS $args
-  
-  if($N_BIN) {
-      
-      $array = $N_BIN -split " "
-      if($array[0] -eq "node") {
-          Invoke-Expression $N_BIN
-      }elseif($array[0] -eq "npm") {
-          Invoke-Expression $N_BIN
-      }elseif($array[0] -eq "npx") {
-          Invoke-Expression $N_BIN
-      }else {
-          Write-Output $N_BIN
-      }
-  }else {
-      $N_V = & $NODE_EXE $N_CLI_JS "-v"
-      $NODE_V = & "node" "-v"
-      $NPM_V = & "npm" "-v"
-      $NPX_V = & "npx" "-v"
-      Write-Output "n $N_V"
-      Write-Output "node $NODE_V"
-      Write-Output "npm v$NPM_V"
-      Write-Output "npx v$NPX_V"
-  }
-  
-  `
+}
+
+$N_CLI_JS="$PSScriptRoot/node_modules/@idev-coder/n/bin/n-cli.js"
+
+$N_BIN = & $NODE_EXE $N_CLI_JS $args
+
+if ($N_BIN) {
+    $array = $N_BIN -split " "
+    if ($array[0] -eq "node" -or $array[0] -eq "npm" -or $array[0] -eq "npx") {
+        Invoke-Expression $N_BIN
+    } else {
+        Write-Output $N_BIN
     }
+} else {
+    $N_V = & $NODE_EXE $N_CLI_JS "-v"
+    $NODE_V = & "node" "-v"
+    $NPM_V = & "npm" "-v"
+    $NPX_V = & "npx" "-v"
+    Write-Output "n $N_V"
+    Write-Output "node $NODE_V"
+    Write-Output "npm v$NPM_V"
+    Write-Output "npx v$NPX_V"
+}
+`
+    };
+
+    return scripts[type] || '';
 }
 
 

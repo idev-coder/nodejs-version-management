@@ -5,64 +5,33 @@ import { node } from './node'
 import { npm } from "./npm"
 import { npx } from "./npx"
 
-function pkgScripts() {
-    const pkgStr = readFileSystem(DIR_PATH_PROJECT_PACKAGE_JSON_FILE)
-    const pkg = JSON.parse(pkgStr)
-    return pkg.scripts
+function pkgScripts(): Record<string, string> | undefined {
+    const pkgStr = readFileSystem(DIR_PATH_PROJECT_PACKAGE_JSON_FILE);
+    const pkg = JSON.parse(pkgStr);
+    return pkg.scripts;
 }
 
-export async function n(options: any[]) {
+export async function n(options: any[]): Promise<any> {
     try {
-        var version: string = await readNodeVersion()
-        var strToArr: any[]
-        var stdout: any
+        const version: any = await readNodeVersion();
+        const firstOption: string = options[0];
 
-        strToArr = options[0].split("")
-        if (version) {
-            if (strToArr[0].includes(".")) {
-                return node(options);
-                // console.log(stdout);
-                // return stdout
-
-            } else if (strToArr[0].includes("/")) {
-                return node(options);
-                // console.log(stdout);
-                // return stdout
-            } else {
-                if (options[0].includes(".mjs")) {
-                    return node(options);
-                    // console.log(stdout);
-                    // return stdout
-                } else if (options[0].includes(".js")) {
-                    return node(options);
-                    // console.log(stdout);
-                    // return stdout
-                } else {
-                    const packageScripts = pkgScripts()
-                    if (packageScripts[`${options[0]}`]) {
-                        if (options[0] === "start") {
-                            return npm([options[0]])
-                            // console.log(stdout);
-                            // return stdout
-                        } else {
-                            return npm(["run", options[0]])
-                            // console.log(stdout);
-                            // return stdout
-                        }
-                    } else {
-
-                        // console.log(MSG_NODE_VERSION_NOT_FOULT);
-                        return npx(options)
-                    }
-                }
-
-            }
-        } else {
-            // console.log(MSG_NODE_VERSION_NOT_FOULT);
-            return MSG_NODE_VERSION_NOT_FOULT
+        if (!version) {
+            return MSG_NODE_VERSION_NOT_FOULT;
         }
 
+        if (firstOption.includes(".") || firstOption.includes("/") || firstOption.endsWith(".mjs") || firstOption.endsWith(".js")) {
+            return node(options);
+        }
+
+        const packageScripts:any = pkgScripts();
+        if (packageScripts[firstOption]) {
+            return firstOption === "start" ? npm([firstOption]) : npm(["run", firstOption]);
+        }
+
+        return npx(options);
+
     } catch (err: any) {
-        return `${err}`
+        return `${err}`;
     }
 }

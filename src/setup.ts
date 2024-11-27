@@ -4,47 +4,38 @@ import * as os from 'os';
 import { downloadAndUnzip } from './download';
 import { arch, DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, DIR_PATH_HOME_FOLDER, DIR_PATH_PROJECT, NODE_DOWNLOAD_MIRROR_URI, platform } from './common';
 import { binScripts } from './bin-scripts';
-import { spawn } from 'child_process'
 
 export async function setupNodeVersion(name: string) {
-  const url = `${NODE_DOWNLOAD_MIRROR_URI}/release/${name}/node-${name}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`
+  const isWindows = os.platform() === "win32";
+  const fileExtension = isWindows ? "zip" : "tar.xz";
+  const url = `${NODE_DOWNLOAD_MIRROR_URI}/release/${name}/node-${name}-${platform}-${arch}.${fileExtension}`;
   const filePath = path.basename(url);
 
   const outputDir = path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name);
   const outputDownloadDir = path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, filePath);
 
-
-  let statusDirVersion = await validateDirVersion(DIR_PATH_HOME_DOT_N_VERSION_FOLDER)
+  const statusDirVersion = await validateDirVersion(DIR_PATH_HOME_DOT_N_VERSION_FOLDER);
   if (statusDirVersion) {
-    let statusOutputDir = await validateDirVersion(outputDir)
-    if (statusOutputDir) {
-      setupFileDotNRC(name)
-
-    } else {
-      setupFileDotNRC(name)
-      downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
+    const statusOutputDir = await validateDirVersion(outputDir);
+    if (!statusOutputDir) {
+      await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name);
     }
+    setupFileDotNRC(name);
   } else {
-    let status: boolean
-    status = await setupFileDotNRC("")
-    status = await setupFloderDotNVersion()
-
+    const status = await setupFileDotNRC("") && await setupFloderDotNVersion();
     if (status) {
-
-      setupFileDotNRC(name)
-      downloadAndUnzip(url, filePath, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
-
+      setupFileDotNRC(name);
+      await downloadAndUnzip(url, filePath, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name);
     }
   }
-
 }
 
-async function setupFloderDotNVersion() {
+async function setupFloderDotNVersion(): Promise<boolean> {
   try {
     fs.mkdirSync(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, { recursive: true });
-    return true
-  } catch (err) {
-    return false
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -52,65 +43,59 @@ async function setupFloderDotNVersion() {
 
 function updateEnvironmentVariables(newVersion: string) {
   try {
+    const newVersionPath:any = `${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${newVersion}`;
+    const newVersionPathUnix = newVersionPath.replaceAll('\\', '/');
 
-    var newVersionPath: any = `${DIR_PATH_HOME_DOT_N_VERSION_FOLDER}\\${newVersion}`
+    const commands = ['npm', 'npx', 'node'];
+    const formats = ['sh', 'cmd', 'pwsh'];
 
-    const script_bin_sh_npm: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npm', 'sh')
-    const script_bin_cmd_npm: any = binScripts(newVersionPath, 'npm', 'cmd')
-    const script_bin_pwsh_npm: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npm', 'pwsh')
-
-    const script_bin_sh_npx: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npx', 'sh')
-    const script_bin_cmd_npx: any = binScripts(newVersionPath, 'npx', 'cmd')
-    const script_bin_pwsh_npx: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'npx', 'pwsh')
-
-    const script_bin_sh_node: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'node', 'sh')
-    const script_bin_cmd_node: any = binScripts(newVersionPath, 'node', 'cmd')
-    const script_bin_pwsh_node: any = binScripts(newVersionPath.replaceAll('\\', '/'), 'node', 'pwsh')
-
-    fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\npm`, script_bin_sh_npm)
-    fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\npm.cmd`, script_bin_cmd_npm)
-    fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\npm.ps1`, script_bin_pwsh_npm)
-
-    fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\npx`, script_bin_sh_npx)
-    fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\npx.cmd`, script_bin_cmd_npx)
-    fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\npx.ps1`, script_bin_pwsh_npx)
-
-    fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\node`, script_bin_sh_node)
-    fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\node.cmd`, script_bin_cmd_node)
-    fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\node.ps1`, script_bin_pwsh_node)
-
-
-  } catch (err: any) {
-    return `${err}`
+    commands.forEach(command => {
+      formats.forEach(format => {
+        const scriptContent:any = binScripts(
+          format === 'cmd' ? newVersionPath : newVersionPathUnix,
+          command,
+          format
+        );
+        const fileExtension = format === 'sh' ? '' : `.${format}`;
+        fs.writeFileSync(`${DIR_PATH_HOME_FOLDER}\\${command}${fileExtension}`, scriptContent);
+      });
+    });
+  } catch (err) {
+    return `${err}`;
   }
-
 }
 
-async function setupFileDotNRC(fileContent: string) {
+/**
+ * Writes content to a specified file, updates environment variables, and logs the content.
+ * @param fileContent - The content to be written and used for updating environment variables.
+ * @returns A promise that resolves to true if successful, otherwise false.
+ */
+async function setupFileDotNRC(fileContent: string): Promise<boolean> {
   try {
     fs.writeFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, fileContent);
-    updateEnvironmentVariables(fileContent)
-    console.log(fileContent);
-
-    return true
+    updateEnvironmentVariables(fileContent);
+    return true;
   } catch (err) {
-    return false
+    console.error('Error writing file or updating environment variables:', err);
+    return false;
   }
 }
 
 
-async function validateDirVersion(directoryPathName: string) {
+/**
+ * Validates if the directory can be read successfully.
+ * @param directoryPathName - The path to the directory to validate.
+ * @returns A promise that resolves to true if the directory is read successfully, false otherwise.
+ */
+async function validateDirVersion(directoryPathName: string): Promise<boolean> {
   try {
-    const files = fs.readdirSync(directoryPathName, { withFileTypes: true });
-    files.forEach((file) => {
+    fs.readdirSync(directoryPathName, { withFileTypes: true }).forEach(file => {
       if (file.isDirectory()) {
+        // Placeholder for future logic if needed
       }
     });
-
-    return true
-
-  } catch (err) {
-    return false
+    return true;
+  } catch {
+    return false;
   }
-
 }

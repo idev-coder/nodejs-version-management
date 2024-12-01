@@ -28,9 +28,10 @@ export async function n(options: any[]) {
                 if (options[0].includes(".mjs") || options[0].includes(".js")) {
                     return bin(engine, options)
                 } else if (options[0].includes(".mts") || options[0].includes(".ts")) {
-                    if (tool === "npm") {
-                        return bin("npx", ['ts-node', options[0]])
-                    }
+                    // if (tool === "npm") {
+                    //     return bin("npx", ['ts-node', options[0]])
+                    // }
+                    return bin("deno", ['run', ...options])
 
                 } else {
                     const packageScripts = pkgScripts()
@@ -43,6 +44,12 @@ export async function n(options: any[]) {
                     } else {
                         if (tool === 'npm') {
                             return bin('npx', options)
+                        } else if (tool === 'pnpm') {
+                            return bin('pnpx', options)
+                        } else if (tool === 'bun') {
+                            return bin('bunx', options)
+                        } else if (tool === 'yarn') {
+                            return bin('yarnpkg', options)
                         }
                     }
                 }

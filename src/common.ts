@@ -5,6 +5,7 @@ import { projectPathFile } from './project-path-file';
   
 export const NODE_MIRROR_URI: string = "https://nodejs.org/dist";
 export const NODE_DOWNLOAD_MIRROR_URI: string = "https://nodejs.org/download";
+export const DENO_DOWNLOAD_MIRROR_URI: string = "https://github.com/denoland/deno/release/download";
 export const MSG_NODE_VERSION_NOT_FOULT: string = "node.js version not found";
 export const MSG_NODE_NOT_VERSION_TYPE: string = "node.js not version type";
 export const MSG_REMOVE_NODE_VERSION_SUCCESS: any = (version:string) => `remove node.js ${version} success`;
@@ -20,8 +21,7 @@ export const DIR_PATH_PROJECT_PACKAGE_JSON_FILE: string = projectPathFile("packa
 export const DIR_PATH_HOME_FOLDER: string = os.homedir()
 export const DIR_PATH_HOME_DOT_N_FOLDER: string = path.join(DIR_PATH_HOME_FOLDER, '.n');
 export const DIR_PATH_HOME_DOT_N_VERSION_FOLDER: string = path.join(DIR_PATH_HOME_DOT_N_FOLDER, 'node_versions');
-export const DIR_PATH_HOME_DOT_BUN_VERSION_FOLDER: string = path.join(DIR_PATH_HOME_DOT_N_FOLDER, 'bun_versions');
-export const DIR_PATH_HOME_DOT_NENO_VERSION_FOLDER: string = path.join(DIR_PATH_HOME_DOT_N_FOLDER, 'neno_versions');
+export const DIR_PATH_HOME_DOT_N_BIN_FOLDER: string = path.join(DIR_PATH_HOME_DOT_N_FOLDER, 'bin');
 export const DIR_PATH_HOME_DOT_N_DOT_NRC_FILE: string = path.join(DIR_PATH_HOME_DOT_N_FOLDER, '.nrc');
 export const DIR_PATH_HOME_DOT_N_PATH_FILE: string = path.join(DIR_PATH_HOME_DOT_N_FOLDER, 'path.txt');
 export const DIR_PATH_HOME_DOT_N_SETTING_FILE: string = path.join(DIR_PATH_HOME_DOT_N_FOLDER, 'settings.json');

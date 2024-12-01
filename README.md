@@ -82,7 +82,7 @@ Usage:
   n version                      Output Version n
   n init [args ...]              New file package.json
   n setup                        Setup Program
-  n set-tool=<toolName>          Tool > npm, pnpm, yarn
+  n set-tool=<toolName>          Tool > npm, pnpm, yarn, bun
 
 Options:
 

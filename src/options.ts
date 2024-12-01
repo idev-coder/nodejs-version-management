@@ -12,7 +12,8 @@ import { setTool } from "./set-tool";
 export async function options(key: string) {
     try {
         const opts = process.argv.slice(3)
-        const tool = 'npm'
+        let settingStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE)
+        let { engine, tool } = JSON.parse(settingStr)
 
         if (["v", "version", "-v", "-V", "-version", "--version"].includes(key)) {
             return `v${VERSION}`
@@ -27,7 +28,7 @@ export async function options(key: string) {
                         let settingStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE)
                         let nrcStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
                         let { engine } = JSON.parse(settingStr)
-                       
+
                         process.stdout.write(`[✓] ${engine} > ${nrcStr}\n`);
                         process.exit(0);
                     }
@@ -144,7 +145,7 @@ export async function options(key: string) {
                 return `[✓] Tool\n`
             }
         } else {
-            return bin(key, [...opts])
+            return n([key, ...opts])
         }
 
 

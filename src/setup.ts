@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import { execFileSync } from 'child_process';
-import { DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_SETTING_FILE, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, DIR_PATH_HOME_FOLDER } from './common';
+import { DENO_DOWNLOAD_MIRROR_URI, DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_SETTING_FILE, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, DIR_PATH_HOME_FOLDER } from './common';
 import path from 'path';
-import { setupFolderDotNVersion, updateFileDotNRC, updateNodeVersion } from './update';
-
+import { setupFolderDotNVersion, updateFileDotNRC, updateNodeVersion, validateDirVersion } from './update';
+import { downloadAndUnzip } from './download';
+import { spawn } from 'child_process';
 const version = "v18.20.5"
 
 export function setup() {
@@ -17,6 +18,7 @@ export function setup() {
             }
             fs.writeFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE, JSON.stringify(setting, null, "\t"));
             await updateFileDotNRC(version)
+            await setupBin()
             execFileSync('setx', ['N_HOME', `"${DIR_PATH_HOME_DOT_N_FOLDER}"`], {
                 stdio: ['pipe', 'pipe', process.stderr],
                 encoding: 'utf8',
@@ -78,19 +80,77 @@ export function setup() {
 
 }
 
+function setupBin() {
+    return new Promise(async (res, rej) => {
+
+        const child = spawn(`winget`, ['install','DenoLand.Deno'], {
+            stdio: ['pipe', 'pipe', process.stderr],
+            shell: true
+        });
+
+        child.stdout.on('data', (data) => {
+            process.stdout.write(data);
+        });
+
+        child.on('error', (error: any) => {
+            process.stdout.write(error);
+        });
+
+        child.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+            process.exit(0);
+        });
+
+        // const nenoVersion = 'v2.1.2'
+        // const name = 'bin'
+        // const url = `${DENO_DOWNLOAD_MIRROR_URI}/${nenoVersion}/deno-x86_64-pc-windows-msvc.zip`
+        // const filePath = path.basename(url);
+        // const outputDir = path.join(DIR_PATH_HOME_DOT_N_FOLDER, name);
+        // const outputDownloadDir = path.join(DIR_PATH_HOME_DOT_N_FOLDER, filePath);
+        // let statusOutputDir = await validateDirVersion(outputDir)
+        // if (!statusOutputDir) {
+        //     // let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_FOLDER, name, 'Bin')
+        //     // if (download) {
+        //     //     res(true)
+        //     // }
+
+        //     const child = spawn(`curl`, ['-L','-o', `${filePath}`, `${url}`], {
+        //         stdio: ['pipe', 'pipe', process.stderr],
+        //         shell: true
+        //     });
+
+        //     child.stdout.on('data', (data) => {
+        //         process.stdout.write(data);
+        //     });
+
+        //     child.on('error', (error: any) => {
+        //         process.stdout.write(error);
+        //     });
+
+        //     child.on('close', (code) => {
+        //         console.log(`child process exited with code ${code}`);
+        //         process.exit(0);
+        //     });
+        // }
+
+    })
+
+}
+
+
 function setupFolderDotN() {
     return new Promise(async (res, rej) => {
         const folders = fs.readdirSync(DIR_PATH_HOME_FOLDER);
 
         if (!folders.includes('.n')) {
             fs.mkdirSync(DIR_PATH_HOME_DOT_N_FOLDER, { recursive: true });
+
             let foldeDotNVersion = await setupFolderDotNVersion()
             if (foldeDotNVersion) {
 
                 res(true)
             }
         } else {
-
             let foldeDotNVersion = await setupFolderDotNVersion()
             if (foldeDotNVersion) {
 

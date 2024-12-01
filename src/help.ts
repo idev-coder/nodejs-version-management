@@ -21,6 +21,8 @@ Usage:
   n npx                          Run NPX
   n version                      Output Version n
   n init [args ...]              New file package.json
+  n setup                        Setup Program
+  n set-tool=<toolName>          Tools npm, pnpm, yarn, bun
 
 Options:
 

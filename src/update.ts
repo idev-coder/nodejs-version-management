@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { downloadAndUnzip } from './download';
-import { arch, DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, DIR_PATH_HOME_FOLDER, NODE_DOWNLOAD_MIRROR_URI, platform } from './common';
+import { arch, DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, NODE_DOWNLOAD_MIRROR_URI, platform } from './common';
 
 export function updateNodeVersion(name: string) {
   return new Promise(async (res, rej) => {
@@ -24,7 +24,7 @@ export function updateNodeVersion(name: string) {
         }
       } else {
         updateFileDotNRC(name)
-        let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
+        let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name, 'NodeJs')
         if (download) {
 
           let updatePkg = await updateEnvironmentVariables(name)
@@ -43,7 +43,7 @@ export function updateNodeVersion(name: string) {
       if (status && folderDotNVersion) {
 
         updateFileDotNRC(name)
-        let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name)
+        let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name, 'NodeJs')
         if (download) {
 
           let setup = await updateEnvironmentVariables(name)
@@ -118,11 +118,11 @@ EXIT /b
 :start
 SETLOCAL
 CALL :find_dp0
-${pathName} %*`)
+${pathName}.cmd %*`)
               results.push(pathName);
             } else if (file.includes(".ps1")) {
               fs.writeFileSync(`${DIR_PATH_HOME_DOT_N_FOLDER}\\${file}`, `#!/usr/bin/env pwsh
-& "${pathName}"  $args
+& "${pathName}.ps1"  $args
 exit $LASTEXITCODE`)
               results.push(pathName);
             }
@@ -157,7 +157,7 @@ export async function updateFileDotNRC(fileContent: string) {
 }
 
 
-async function validateDirVersion(directoryPathName: string) {
+export async function validateDirVersion(directoryPathName: string) {
   try {
     const files = fs.readdirSync(directoryPathName, { withFileTypes: true });
     files.forEach((file) => {

@@ -10,8 +10,8 @@ import { loading } from 'cli-loading-animation'
 
 
 // ฟังก์ชันสำหรับดาวน์โหลดไฟล์พร้อมแสดงเปอร์เซ็นต์การโหลด
-export async function downloadFile(url: string, outputLocationPath: string) {
-    const { start, stop } = loading('Download Node..');
+export async function downloadFile(url: string, outputLocationPath: string,name?:string) {
+    const { start, stop } = loading(`Downloads ${name}..`);
     start()
     return new Promise((res, rej) => {
         const fileStream = fs.createWriteStream(outputLocationPath);
@@ -35,7 +35,7 @@ export async function downloadFile(url: string, outputLocationPath: string) {
                 fileStream.close(() => {
                     res(100)
                     stop()
-                    process.stdout.write("[✓] Download NodeJS\n");
+                    process.stdout.write(`[✓] Download ${name}\n`);
                 });
             });
         }).on('error', (err) => { // Handle errors
@@ -112,7 +112,7 @@ async function tryInstall(path: string): Promise<boolean | any> {
         });
 
 
-        const npmInstall = execFileSync('npm', ['install', '-S', '@idev-coder/n', 'pnpm', 'yarn'], {
+        const npmInstall = execFileSync('npm', ['install', '-S', '@idev-coder/n', 'pnpm', 'yarn', 'bun'], {
             cwd: path,
             stdio: ['pipe', 'pipe', process.stderr],
             encoding: 'utf8',
@@ -133,11 +133,13 @@ export async function extractTarXZ(filePath: string, extractToPath: string, vers
     return new Promise(async (res, rej) => {
 
         if (fs.existsSync(filePath)) {
+            
             execFileSync(`tar`, ['-xf', filePath, '-C', extractToPath], {
                 stdio: ['pipe', 'pipe', process.stderr],
                 encoding: 'utf8',
                 shell: true
             });
+          
             const oldPath = path.join(extractToPath, `node-${version}-${platform}-${arch}`);
             const newPath = path.join(extractToPath, `${version}`);
             const del = await tryDeleteFile(filePath)
@@ -170,9 +172,9 @@ export async function extractTarXZ(filePath: string, extractToPath: string, vers
 }
 
 // ดาวน์โหลดและแตกไฟล์
-export async function downloadAndUnzip(url: string, filePath: string, outputDir: string, version: string) {
+export async function downloadAndUnzip(url: string, filePath: string, outputDir: string, version: string,name?:string) {
     try {
-        const res = await downloadFile(url, filePath);
+        const res = await downloadFile(url, filePath,name);
 
         if (res === 100) {
             let ex = await extractTarXZ(filePath, outputDir, version);

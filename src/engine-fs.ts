@@ -1,6 +1,5 @@
 import * as fs from 'fs'
 import { DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, DIR_PATH_PROJECT_DOT_NODE_VERSION_FILE, DIR_PATH_PROJECT_DOT_NRC_FILE, DIR_PATH_PROJECT_DOT_NVMRC_FILE, DIR_PATH_PROJECT_PACKAGE_JSON_FILE, MSG_REMOVE_NODE_VERSION_SUCCESS } from './common';
-import readline from 'readline'
 
 export function readFileSystem(directoryPath: string) {
     try {

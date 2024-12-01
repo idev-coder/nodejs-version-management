@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import { MSG_NODE_VERSION_NOT_FOULT, MSG_NODE_NOT_VERSION_TYPE, DIR_PATH_HOME_DOT_N_VERSION_FOLDER } from "./common";
 import { nodeListVersion } from "./services";
-import { NodeVersionType, VersionDataType } from "./types";
+import { NodeVersionType } from "./types";
 
 export async function nodeOnlineVersion(name?: string | null | undefined) {
     try {
@@ -29,6 +29,7 @@ export async function nodeOnlineVersion(name?: string | null | undefined) {
                 let strToArr = newName.split("")
 
                 if (numberRegex.test(strToArr[0]) || (strToArr[0].includes("v") && numberRegex.test(strToArr[1]))) {
+                    
                     if (strToArr[0].includes("v")) {
                         let dataVersions = listVersion.filter((val: NodeVersionType) => val.version.includes(newName))
 
@@ -42,8 +43,6 @@ export async function nodeOnlineVersion(name?: string | null | undefined) {
                         if (strToArr.length === 1) {
                             let dataVersions = listVersion.filter((val: NodeVersionType) => {
                                 let splitVersion: any = val.version.split(".")
-
-                                // console.log(splitVersion[0].split("")[1]);
 
                                 if (newName.length === 1) {
 
@@ -84,6 +83,7 @@ export async function nodeOnlineVersion(name?: string | null | undefined) {
                     }
 
                 } else {
+                   
                     return {
                         message: MSG_NODE_NOT_VERSION_TYPE,
                         data: []
@@ -111,12 +111,10 @@ export async function nodeOnlineVersion(name?: string | null | undefined) {
 export async function nodeLocalVersion(name?: string | null | undefined) {
     try {
         const files = fs.readdirSync(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, { withFileTypes: true });
-        // console.log('รายการโฟลเดอร์:');
         const versions: any[] = []
 
         files.forEach((file) => {
             if (file.isDirectory()) {
-                // console.log(file.name);
                 versions.push(file.name)
             }
         });

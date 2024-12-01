@@ -2,25 +2,19 @@ import * as fs from 'fs';
 import https from 'https'
 import progressStream from 'progress-stream';
 import path from 'path'
-import { arch, platform } from './common';
-import readline from 'readline'
-import { spawn } from 'child_process';
+import { arch, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, platform } from './common';
+import { execFileSync } from 'child_process';
+import { updateEnvironmentVariables } from './update';
+import { loading } from 'cli-loading-animation'
 
 
-const spinnerFrames = ['|', '/', '-', '\\'];
-let currentFrame = 0;
-
-function showSpinner() {
-    readline.cursorTo(process.stdout, 0);
-    process.stdout.write(spinnerFrames[currentFrame]);
-    currentFrame = (currentFrame + 1) % spinnerFrames.length;
-}
 
 // ฟังก์ชันสำหรับดาวน์โหลดไฟล์พร้อมแสดงเปอร์เซ็นต์การโหลด
 export async function downloadFile(url: string, outputLocationPath: string) {
+    const { start, stop } = loading('Download Node..');
+    start()
     return new Promise((res, rej) => {
         const fileStream = fs.createWriteStream(outputLocationPath);
-        const interval = setInterval(showSpinner, 100); // Adjust speed here
         // Create a progress stream
         const progress: any = progressStream({
             length: 0, // Placeholder for total length
@@ -28,7 +22,7 @@ export async function downloadFile(url: string, outputLocationPath: string) {
         });
 
         // Handle progress events
-     
+
 
         https.get(url, (response) => {
             // Set the length of the progress stream to the size of the file (if known)
@@ -37,106 +31,158 @@ export async function downloadFile(url: string, outputLocationPath: string) {
             response.pipe(progress).pipe(fileStream);
 
             fileStream.on('finish', () => {
-                clearInterval(interval);
-                readline.cursorTo(process.stdout, 0);
+
                 fileStream.close(() => {
                     res(100)
-                    // if (cb) cb(undefined, 100); // Call callback with 100% progress when done
+                    stop()
+                    process.stdout.write("[✓] Download NodeJS\n");
                 });
             });
         }).on('error', (err) => { // Handle errors
             fs.unlinkSync(outputLocationPath); // Delete the file if there's an error
-            // if (cb) cb(err.message);
+
             rej(err)
+            stop()
         });
     })
 }
 
 // ฟังก์ชันสำหรับแตกไฟล์
 
-function tryDeleteFile(filePath: string, retries = 5, delay = 1000) {
-    fs.unlink(filePath, (err) => {
-        if (err) {
-            if (retries > 0 && err.code === 'EBUSY') {
-                // console.log('File is busy, retrying...');
-                setTimeout(() => tryDeleteFile(filePath, retries - 1, delay), delay);
-            } else {
-                // console.error('Error removing file:', err);
-            }
-        } else {
-            // console.log('File removed successfully.');
-        }
-    });
+/**
+ * Asynchronously attempts to delete a file at the given path.
+ * @param filePath - The path to the file to be deleted.
+ * @returns A promise that resolves to true if the file is successfully deleted, or rejects with an error.
+ */
+async function tryDeleteFile(filePath: string): Promise<boolean> {
+    try {
+
+        await fs.unlinkSync(filePath);
+        return true;
+    } catch (error) {
+        throw error;
+    }
 }
 
-function tryRename(oldPath: string, newPath: string, retries = 5, delay = 1000) {
-    fs.rename(oldPath, newPath, (err) => {
-        if (err) {
-            if (retries > 0 && (err.code === 'EPERM' || err.code === 'EBUSY')) {
-                // console.log('File is busy or permission error, retrying...');
-                setTimeout(() => tryRename(oldPath, newPath, retries - 1, delay), delay);
-            } else {
-                // console.error('Error renaming file:', err);
-            }
-        } else {
-            // console.log('File renamed successfully.');
-        }
-    });
+async function tryRename(oldPath: string, newPath: string) {
+    try {
+        await fs.renameSync(oldPath, newPath)
+        return true
+    } catch (error) {
+        throw error;
+    }
 }
 
-export function extractTarXZ(filePath: string, extractToPath: string, version: string) {
+async function trySetup(version: string) {
+    return new Promise((res, rej) => {
+        const sourceFolder = path.join(__dirname, '../', 'commands');
+        const destinationFolder = path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, version)
+        let results: any[] = [];
+
+        // อ่านไฟล์ในโฟลเดอร์ต้นทาง
+        const files = fs.readdirSync(sourceFolder);
+        files.forEach(file => {
+            const sourceFile = path.join(sourceFolder, file);
+            const destFile = path.join(destinationFolder, file);
+            const stats = fs.statSync(sourceFile);
+            if (!stats.isDirectory()) {
+
+                const data = fs.readFileSync(sourceFile, 'utf8');
+                results.push(data);
+                fs.writeFileSync(destFile, data)
+            }
+        })
+
+        res(results)
+        process.stdout.write("[✓] Setup\n");
+    })
 
 
-    const interval = setInterval(showSpinner, 100); // Adjust speed here
 
-    if (fs.existsSync(filePath)) {
-        const ls = spawn(`tar`, ['-xf', filePath, '-C', extractToPath], {
-            stdio: ['pipe', 'pipe', process.stderr],
+}
+
+async function tryInstall(path: string): Promise<boolean | any> {
+    process.stdout.write("[..] Install Package");
+    return new Promise((res, rej) => {
+        const npmInit = execFileSync('npm', ['init', '-y'], {
+            cwd: path,
+            stdio: 'pipe',
+            encoding: 'utf8',
             shell: true
         });
 
-        ls.stdout.on('data', (data) => {
-            // console.log(data);
-            process.stdout.write(`${data}`);
-        })
-        ls.on('close', (code) => {
-            // process.stdout.write(`child process close all stdio with code ${code}`);
+
+        const npmInstall = execFileSync('npm', ['install', '-S', '@idev-coder/n', 'pnpm', 'yarn'], {
+            cwd: path,
+            stdio: ['pipe', 'pipe', process.stderr],
+            encoding: 'utf8',
+            shell: true
+        });
+
+        if (npmInit && npmInstall) {
+            res(true)
+            process.stdout.write("[✓] Install Package\n");
+
+        }
+    })
+
+}
+
+export async function extractTarXZ(filePath: string, extractToPath: string, version: string) {
+
+    return new Promise(async (res, rej) => {
+
+        if (fs.existsSync(filePath)) {
+            execFileSync(`tar`, ['-xf', filePath, '-C', extractToPath], {
+                stdio: ['pipe', 'pipe', process.stderr],
+                encoding: 'utf8',
+                shell: true
+            });
             const oldPath = path.join(extractToPath, `node-${version}-${platform}-${arch}`);
             const newPath = path.join(extractToPath, `${version}`);
-            tryDeleteFile(filePath)
-            tryRename(oldPath, newPath)
+            const del = await tryDeleteFile(filePath)
+            if (del) {
+                let rename = await tryRename(oldPath, newPath)
+                if (rename) {
+                    process.stdout.write("[✓] Extract\n");
 
-            clearInterval(interval);
-            readline.cursorTo(process.stdout, 0);
-            process.stdout.write('Done!\n');
-        });
-
-        ls.on('exit', (code) => {
-            // process.stdout.write(`child process exited with code ${code}`);
-
-        });
-
+                    let setup: any = await trySetup(version)
+                    if (setup.length > 0) {
+                        let updateEnv: any = await updateEnvironmentVariables(version)
+                        if (updateEnv.length > 0) {
+                            const install = await tryInstall(path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, version))
+                            res(install)
+                        }
+                    }
 
 
-    } else {
-        console.error('ไม่พบ:', filePath);
-    }
-    ;
+                }
+            }
+
+
+        } else {
+            rej(filePath)
+            console.error('ไม่พบ:', filePath);
+
+        }
+    })
+
 }
 
 // ดาวน์โหลดและแตกไฟล์
 export async function downloadAndUnzip(url: string, filePath: string, outputDir: string, version: string) {
     try {
-        console.log('Installing...');
-
         const res = await downloadFile(url, filePath);
 
         if (res === 100) {
-            extractTarXZ(filePath, outputDir, version);
+            let ex = await extractTarXZ(filePath, outputDir, version);
+            if (ex) {
+                return true
+            }
         }
 
     } catch (error) {
         console.error('เกิดข้อผิดพลาด:', error);
-        return false
+        return error
     }
 }

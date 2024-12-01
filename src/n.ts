@@ -1,9 +1,8 @@
 
-import { DIR_PATH_PROJECT_PACKAGE_JSON_FILE, MSG_NODE_VERSION_NOT_FOULT } from "./common"
+import * as fs from 'fs'
+import { DIR_PATH_HOME_DOT_N_SETTING_FILE, DIR_PATH_PROJECT_PACKAGE_JSON_FILE, MSG_NODE_VERSION_NOT_FOULT } from "./common"
 import { readFileSystem, readNodeVersion } from "./engine-fs"
-import { node } from './node'
-import { npm } from "./npm"
-import { npx } from "./npx"
+import { bin } from "./bin"
 
 function pkgScripts() {
     const pkgStr = readFileSystem(DIR_PATH_PROJECT_PACKAGE_JSON_FILE)
@@ -16,49 +15,40 @@ export async function n(options: any[]) {
         var version: string = await readNodeVersion()
         var strToArr: any[]
         var stdout: any
+        const settingStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE)
+        const { engine, tool } = JSON.parse(settingStr)
+
 
         strToArr = options[0].split("")
         if (version) {
-            if (strToArr[0].includes(".")) {
-                return node(options);
-                // console.log(stdout);
-                // return stdout
+            if (strToArr[0].includes(".") || strToArr[0].includes("/")) {
+                return bin(engine, options)
 
-            } else if (strToArr[0].includes("/")) {
-                return node(options);
-                // console.log(stdout);
-                // return stdout
             } else {
-                if (options[0].includes(".mjs")) {
-                    return node(options);
-                    // console.log(stdout);
-                    // return stdout
-                } else if (options[0].includes(".js")) {
-                    return node(options);
-                    // console.log(stdout);
-                    // return stdout
+                if (options[0].includes(".mjs") || options[0].includes(".js")) {
+                    return bin(engine, options)
+                } else if (options[0].includes(".mts") || options[0].includes(".ts")) {
+                    if (tool === "npm") {
+                        return bin("npx", ['ts-node', options[0]])
+                    }
+
                 } else {
                     const packageScripts = pkgScripts()
                     if (packageScripts[`${options[0]}`]) {
                         if (options[0] === "start") {
-                            return npm([options[0]])
-                            // console.log(stdout);
-                            // return stdout
+                            return bin(tool, [options[0]])
                         } else {
-                            return npm(["run", options[0]])
-                            // console.log(stdout);
-                            // return stdout
+                            return bin(tool, ["run", options[0]])
                         }
                     } else {
-
-                        // console.log(MSG_NODE_VERSION_NOT_FOULT);
-                        return npx(options)
+                        if (tool === 'npm') {
+                            return bin('npx', options)
+                        }
                     }
                 }
 
             }
         } else {
-            // console.log(MSG_NODE_VERSION_NOT_FOULT);
             return MSG_NODE_VERSION_NOT_FOULT
         }
 

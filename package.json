@@ -1,7 +1,7 @@
 {
   "name": "@idev-coder/n",
-  "version": "3.0.0",
-  "main": "bin/n-cli.js",
+  "version": "3.1.0",
+  "main": "lib/cli.js",
   "homepage": "https://idev-coder.github.io/nodejs-version-management/",
   "bugs": {
     "url": "https://github.com/idev-coder/nodejs-version-management/issues"
@@ -13,7 +13,7 @@
     }
   ],
   "bin": {
-    "n": "bin/n-cli.js"
+    "n": "bin/n-cli.cjs"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -28,7 +28,9 @@
     "npm",
     "npx",
     "manager",
-    "version"
+    "version",
+    "yarn",
+    "pnpm"
   ],
   "repository": {
     "type": "git",
@@ -51,12 +53,9 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@idev-coder/n": "^2.0.4",
     "cli-loading-animation": "^1.0.6",
     "log-update": "^6.1.0",
-    "pnpm": "^9.14.4",
     "progress-stream": "^2.0.0",
-    "readline": "^1.3.0",
-    "yarn": "^1.22.22"
+    "readline": "^1.3.0"
   }
 }

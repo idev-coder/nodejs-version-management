@@ -23,26 +23,56 @@ export function setup() {
                 encoding: 'utf8',
                 shell: true
             });
+            try {
 
-            const pathNode = execFileSync('where', ['node'], {
-                stdio: ['pipe', 'pipe', process.stderr],
-                encoding: 'utf8',
-                shell: true
-            });
-
-            const pathNodeArr = pathNode.split("\n")
-
-            if (pathNodeArr.length > 1) {
-                const pathArr: any[] = []
-                pathNodeArr.forEach((patnNode: string) => {
-                    if (patnNode.includes('node.exe')) {
-                        pathArr.push(patnNode)
-                    }
-
+                const pathNode = execFileSync('where', ['node'], {
+                    stdio: ['pipe', 'pipe', process.stderr],
+                    encoding: 'utf8',
+                    shell: true
                 });
 
-                if (pathArr.length > 1) {
-                    let val = await setNodeSymLink(pathArr[0])
+                const pathNodeArr = pathNode ? pathNode.split("\n") : []
+
+                if (pathNodeArr.length > 1) {
+                    const pathArr: any[] = []
+                    pathNodeArr.forEach((patnNode: string) => {
+                        if (patnNode.includes('node.exe')) {
+                            pathArr.push(patnNode)
+                        }
+
+                    });
+
+                    if (pathArr.length > 1) {
+                        let val = await setNodeSymLink(pathArr[0])
+                        if (val) {
+                            let checkNode = await updateNode()
+                            if (checkNode) {
+                                res(true)
+                            } else {
+                                let nv = await installNode(version)
+                                if (nv) {
+                                    await setupBin()
+                                    res(true)
+                                }
+                            }
+                        }
+                    } else {
+                        let val = await setNodeSymLink(pathArr[0])
+                        if (val) {
+                            let checkNode = await updateNode()
+                            if (checkNode) {
+                                res(true)
+                            } else {
+                                let nv = await installNode(version)
+                                if (nv) {
+                                    await setupBin()
+                                    res(true)
+                                }
+                            }
+                        }
+                    }
+
+                    let val = await setNodeSymLink(pathNodeArr[0])
                     if (val) {
                         let checkNode = await updateNode()
                         if (checkNode) {
@@ -54,42 +84,24 @@ export function setup() {
                                 res(true)
                             }
                         }
+                    }
+                } else if (pathNodeArr.length === 1) {
+                    let val = await setNodeSymLink(pathNodeArr[0])
+                    if (val) {
+                        res(true)
                     }
                 } else {
-                    let val = await setNodeSymLink(pathArr[0])
-                    if (val) {
-                        let checkNode = await updateNode()
-                        if (checkNode) {
-                            res(true)
-                        } else {
-                            let nv = await installNode(version)
-                            if (nv) {
-                                await setupBin()
-                                res(true)
-                            }
-                        }
-                    }
-                }
-
-                let val = await setNodeSymLink(pathNodeArr[0])
-                if (val) {
-                    let checkNode = await updateNode()
-                    if (checkNode) {
-                        res(true)
-                    } else {
-                        let nv = await installNode(version)
-                        if (nv) {
+                    let nv = await installNode(version)
+                    if (nv) {
+                        let val = await setNodeSymLink(`${path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, version)}`)
+                        if (val) {
                             await setupBin()
                             res(true)
                         }
                     }
+
                 }
-            } else if (pathNodeArr.length === 1) {
-                let val = await setNodeSymLink(pathNodeArr[0])
-                if (val) {
-                    res(true)
-                }
-            } else {
+            } catch (err) {
                 let nv = await installNode(version)
                 if (nv) {
                     let val = await setNodeSymLink(`${path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, version)}`)

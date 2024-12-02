@@ -11,7 +11,7 @@ export async function commands(keys: any[]) {
 
     try {
         var option = await nodeOnlineVersion(keys[0])
-       
+
         if (keys[0]) {
             if (option.data.length > 0) {
                 if (option.data.length === 1) {
@@ -55,7 +55,7 @@ export async function commands(keys: any[]) {
                             updateEnvironmentVariables(version)
                             process.exit(0);
                         });
-                    } else if (option === version) {
+                    } else if (option.split("")[0] === "v" && /\d/g.test(option.split("")[1])) {
                         process.stdout.write(`${option}\n`);
                         process.exit(0);
                     } else {

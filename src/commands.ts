@@ -11,13 +11,13 @@ export async function commands(keys: any[]) {
 
     try {
         var option = await nodeOnlineVersion(keys[0])
-        let settingStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE)
-        let version: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
+       
         if (keys[0]) {
             if (option.data.length > 0) {
                 if (option.data.length === 1) {
                     if (await updateNodeVersion(option.message)) {
-
+                        let settingStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE)
+                        let version: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
                         let { engine } = JSON.parse(settingStr)
 
                         process.stdout.write(`[✓] ${engine} > ${version}\n`);
@@ -36,7 +36,7 @@ export async function commands(keys: any[]) {
                 if (option) {
                     let cmd: any[] = option.split(" ")
                     const [tool, ...opts] = cmd
-
+                    let version: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
                     if ((opts.includes('install') || opts.includes('add')) && (opts.includes('-g') || opts.includes('global'))) {
                         let child = spawn(`${tool}`, opts, {
                             stdio: ['pipe', 'pipe', process.stderr],

@@ -1,9 +1,8 @@
 import * as fs from 'fs';
 import { execFileSync } from 'child_process';
-import { DENO_DOWNLOAD_MIRROR_URI, DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_SETTING_FILE, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, DIR_PATH_HOME_FOLDER } from './common';
+import { DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_SETTING_FILE, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, DIR_PATH_HOME_FOLDER } from './common';
 import path from 'path';
-import { setupFolderDotNVersion, updateFileDotNRC, updateNodeVersion, validateDirVersion } from './update';
-import { downloadAndUnzip } from './download';
+import { setupFolderDotNVersion, updateFileDotNRC, updateNodeVersion } from './update';
 import { spawn } from 'child_process';
 const version = "v18.20.5"
 

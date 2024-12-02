@@ -32,6 +32,7 @@ export async function commands(keys: any[]) {
             } else if (option.message === MSG_NODE_NOT_VERSION_TYPE) {
 
                 let option = await options(keys[0])
+                
                 if (option) {
                     let cmd: any[] = option.split(" ")
                     const [tool, ...opts] = cmd

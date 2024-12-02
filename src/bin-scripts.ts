@@ -131,7 +131,7 @@ const binPaths = [
 const binScripts = binPaths.map(({ path, files }) => {
     return files.map(val => {
         if (val.includes(".cmd")) {
-            return cmdScript(val, path.replaceAll('/', '\\'))
+            return cmdScript(val, path.replace(/\//g, '\\\\'))
         } else if (val.includes(".ps1")) {
             return ps1Script(val, path)
         } else {

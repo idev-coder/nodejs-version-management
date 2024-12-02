@@ -28,9 +28,11 @@ export async function n(options: any[]) {
                 if (options[0].includes(".mjs") || options[0].includes(".js")) {
                     return bin(engine, options)
                 } else if (options[0].includes(".mts") || options[0].includes(".ts")) {
-                    // if (tool === "npm") {
-                    //     return bin("npx", ['ts-node', options[0]])
-                    // }
+                
+                    return bin("deno", ['run', ...options])
+
+                }else if (options[0].includes("http://") || options[0].includes("https://")) {
+                
                     return bin("deno", ['run', ...options])
 
                 } else {

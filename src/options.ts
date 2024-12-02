@@ -12,7 +12,7 @@ import { setTool } from "./set-tool";
 export async function options(key: string) {
     try {
         const opts = process.argv.slice(2).toString().split(" ")
-     
+
         let settingStr: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE)
         let { engine, tool } = JSON.parse(settingStr)
 
@@ -35,20 +35,37 @@ export async function options(key: string) {
                     }
 
                 } else {
-                    let [opt0, opt1, opt2,...opt3] = opts
-                    let packageName = !['-g', '-G', 'global', '--global', '-w', '-W', '--workspace', 'workspace', '--dev', '-d', '-D', '--save-dev'].includes(opt1) ? opt1 : opt2
-                    if (['-g', '-G', 'global', '--global'].includes(opt1) || ['-g', '-G', 'global', '--global'].includes(opt2)) {
-                        let installGlobal = tool === 'yarn' ? 'global' : '-g'
-                        return bin(tool, [optionName, installGlobal, packageName, ...opt3])
-                    } else if (['-w', '-W', '--workspace', 'workspace'].includes(opt1) || ['-w', '-W', '--workspace', 'workspace'].includes(opt2)) {
-                        let installWorkspace = tool === 'yarn' ? 'workspace' : '--workspace'
-                        return bin(tool, [optionName, installWorkspace, packageName, ...opt3])
-                    } else if (['--dev', '-d', '-D', '--save-dev'].includes(opt1) || ['--dev', '-d', '-D', '--save-dev'].includes(opt2)) {
-                        let installDev = tool === 'npm' ? '--save-dev' : '--dev'
-                        return bin(tool, [optionName, installDev, packageName, ...opt3])
-                    } else {
-                        return bin(tool, [optionName, ...(opt3 as any[]).shift()])
+                    if (opts.length < 2) {
+                        if(['npm','pnpm'].includes(tool) ) {
+                            return bin(tool, ['install'])
+                        }else if(tool === 'yarn') {
+                            return bin(tool,[])
+                        }
+                        
+                    }else {
+                        let [opt0, opt1, opt2, ...opt3] = opts
+                        let packageName = !['-g', '-G', 'global', '--global', '-w', '-W', '--workspace', 'workspace', '--dev', '-d', '-D', '--save-dev'].includes(opt1) ? opt1 : opt2
+                        if (['-g', '-G', 'global', '--global'].includes(opt1) || ['-g', '-G', 'global', '--global'].includes(opt2)) {
+                            let installGlobal = tool === 'yarn' ? 'global' : '-g'
+                            return bin(tool, [optionName, installGlobal, packageName, ...opt3])
+                        } else if (['-w', '-W', '--workspace', 'workspace'].includes(opt1) || ['-w', '-W', '--workspace', 'workspace'].includes(opt2)) {
+                            let installWorkspace = tool === 'yarn' ? 'workspace' : '--workspace'
+                            return bin(tool, [optionName, installWorkspace, packageName, ...opt3])
+                        } else if (['--dev', '-d', '-D', '--save-dev'].includes(opt1) || ['--dev', '-d', '-D', '--save-dev'].includes(opt2)) {
+                    
+                            if(['npm'].includes(tool)) {
+                                return bin(tool, ['install', '-D', packageName, ...opt3])
+                            } else if(['yarn'].includes(tool)) {
+                                return bin(tool, ['add', '-D', packageName, ...opt3])
+                            }else if(['pnpm'].includes(tool)) {
+                                return bin(tool, ['add', '-D', packageName, ...opt3])
+                            }
+                         
+                        } else {
+                            return bin(tool, [optionName, ...(opt3 as any[]).shift()])
+                        }
                     }
+                    
                 }
             } else {
                 return bin(tool, [optionName])
@@ -125,19 +142,23 @@ export async function options(key: string) {
                     return removeNodeVersion(opts[0])
 
                 } else {
-                    let [opt0, opt1, opt2,...opt3] = opts
-                    let packageName = !['-g', '-G', 'global', '--global', '-w', '-W', '--workspace', 'workspace', '--dev', '-d', '-D', '--save-dev'].includes(opt1) ? opt1 : opt2
-                    if (['-g', '-G', 'global', '--global'].includes(opt1) || ['-g', '-G', 'global', '--global'].includes(opt2)) {
-                        let installGlobal = tool === 'yarn' ? 'global' : '-g'
-                        return bin(tool, [optionName, installGlobal, packageName, ...opt3])
-                    } else if (['-w', '-W', '--workspace', 'workspace'].includes(opt1) || ['-w', '-W', '--workspace', 'workspace'].includes(opt2)) {
-                        let installWorkspace = tool === 'yarn' ? 'workspace' : '--workspace'
-                        return bin(tool, [optionName, installWorkspace, packageName, ...opt3])
-                    } else if (['--dev', '-d', '-D', '--save-dev'].includes(opt1) || ['--dev', '-d', '-D', '--save-dev'].includes(opt2)) {
-                        let installDev = tool === 'npm' ? '--save-dev' : '--dev'
-                        return bin(tool, [optionName, installDev, packageName, ...opt3])
-                    } else {
-                        return bin(tool, [optionName, ...(opt3 as any[]).shift()])
+                    if (opts.length < 2) {
+                        return bin(tool, [optionName])
+                    }else {
+                        let [opt0, opt1, opt2, ...opt3] = opts
+                        let packageName = !['-g', '-G', 'global', '--global', '-w', '-W', '--workspace', 'workspace', '--dev', '-d', '-D', '--save-dev'].includes(opt1) ? opt1 : opt2
+                        if (['-g', '-G', 'global', '--global'].includes(opt1) || ['-g', '-G', 'global', '--global'].includes(opt2)) {
+                            let installGlobal = tool === 'yarn' ? 'global' : '-g'
+                            return bin(tool, [optionName, installGlobal, packageName, ...opt3])
+                        } else if (['-w', '-W', '--workspace', 'workspace'].includes(opt1) || ['-w', '-W', '--workspace', 'workspace'].includes(opt2)) {
+                            let installWorkspace = tool === 'yarn' ? 'workspace' : '--workspace'
+                            return bin(tool, [optionName, installWorkspace, packageName, ...opt3])
+                        } else if (['--dev', '-d', '-D', '--save-dev'].includes(opt1) || ['--dev', '-d', '-D', '--save-dev'].includes(opt2)) {
+                            let installDev = tool === 'npm' ? '--save-dev' : '--dev'
+                            return bin(tool, [optionName, installDev, packageName, ...opt3])
+                        } else {
+                            return bin(tool, [optionName, ...(opt3 as any[]).shift()])
+                        }
                     }
                 }
             } else {

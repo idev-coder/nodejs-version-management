@@ -21,7 +21,7 @@ export async function options(key: string) {
             return help()
         } else if (["i", "install", "use", "add"].includes(key)) {
             let optionName = tool === 'npm' ? 'install' : 'add'
-            if (opts[0]) {
+            if (opts.length > 0) {
                 let option = await nodeOnlineVersion(opts[0])
                 if (option.data.length === 1) {
                     if (await updateNodeVersion(option.message)) {
@@ -34,15 +34,17 @@ export async function options(key: string) {
                     }
 
                 } else {
-                    if (['-g', '-G', 'global', '--global'].includes(option)) {
+                    let [opt0, opt1, ...opt3] = opts
+                    let packageName = !['-g', '-G', 'global', '--global', '-w', '-W', '--workspace', 'workspace', '--dev', '-d', '-D', '--save-dev'].includes(opt0) ? opt0 : opt1
+                    if (['-g', '-G', 'global', '--global'].includes(opt0) || ['-g', '-G', 'global', '--global'].includes(opt1)) {
                         let installGlobal = tool === 'yarn' ? 'global' : '-g'
-                        return bin(tool, [optionName, installGlobal, ...opts])
-                    } else if (['-w', '-W', '--workspace', 'workspace'].includes(option)) {
+                        return bin(tool, [optionName, installGlobal, packageName, ...opt3])
+                    } else if (['-w', '-W', '--workspace', 'workspace'].includes(opts[0]) || ['-w', '-W', '--workspace', 'workspace'].includes(opts[1])) {
                         let installWorkspace = tool === 'yarn' ? 'workspace' : '--workspace'
-                        return bin(tool, [optionName, installWorkspace, ...opts])
-                    } else if (['--dev', '-d', '-D', '--save-dev'].includes(option)) {
+                        return bin(tool, [optionName, installWorkspace, packageName, ...opt3])
+                    } else if (['--dev', '-d', '-D', '--save-dev'].includes(opts[0]) || ['--dev', '-d', '-D', '--save-dev'].includes(opts[1])) {
                         let installDev = tool === 'npm' ? '--save-dev' : '--dev'
-                        return bin(tool, [optionName, installDev, ...opts])
+                        return bin(tool, [optionName, installDev, packageName, ...opt3])
                     } else {
                         return bin(tool, [optionName, ...opts])
                     }
@@ -116,21 +118,23 @@ export async function options(key: string) {
             }
         } else if (["un", "rm", "del", "uninstall", "remove", "delete"].includes(key)) {
             let optionName = tool === 'npm' ? 'uninstall' : 'remove'
-            if (opts[0]) {
+            if (opts.length > 0) {
                 let option = await nodeOnlineVersion(opts[0])
                 if (option.data.length === 1) {
                     return removeNodeVersion(opts[0])
 
                 } else {
-                    if (['-g', '-G', 'global', '--global'].includes(option)) {
+                    let [opt0, opt1, ...opt3] = opts
+                    let packageName = !['-g', '-G', 'global', '--global', '-w', '-W', '--workspace', 'workspace', '--dev', '-d', '-D', '--save-dev'].includes(opt0) ? opt0 : opt1
+                    if (['-g', '-G', 'global', '--global'].includes(opt0) || ['-g', '-G', 'global', '--global'].includes(opt1)) {
                         let installGlobal = tool === 'yarn' ? 'global' : '-g'
-                        return bin(tool, [optionName, installGlobal, ...opts])
-                    } else if (['-w', '-W', '--workspace', 'workspace'].includes(option)) {
+                        return bin(tool, [optionName, installGlobal, packageName, ...opt3])
+                    } else if (['-w', '-W', '--workspace', 'workspace'].includes(opts[0]) || ['-w', '-W', '--workspace', 'workspace'].includes(opts[1])) {
                         let installWorkspace = tool === 'yarn' ? 'workspace' : '--workspace'
-                        return bin(tool, [optionName, installWorkspace, ...opts])
-                    } else if (['--dev', '-d', '-D', '--save-dev'].includes(option)) {
+                        return bin(tool, [optionName, installWorkspace, packageName, ...opt3])
+                    } else if (['--dev', '-d', '-D', '--save-dev'].includes(opts[0]) || ['--dev', '-d', '-D', '--save-dev'].includes(opts[1])) {
                         let installDev = tool === 'npm' ? '--save-dev' : '--dev'
-                        return bin(tool, [optionName, installDev, ...opts])
+                        return bin(tool, [optionName, installDev, packageName, ...opt3])
                     } else {
                         return bin(tool, [optionName, ...opts])
                     }

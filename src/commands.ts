@@ -11,7 +11,6 @@ export async function commands(keys: any[]) {
 
     try {
         var option = await nodeOnlineVersion(keys[0])
-
         if (keys[0]) {
             if (option.data.length > 0) {
                 if (option.data.length === 1) {
@@ -37,7 +36,9 @@ export async function commands(keys: any[]) {
                     let cmd: any[] = option.split(" ")
                     const [tool, ...opts] = cmd
                     let version: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
-                    if ((opts.includes('install') || opts.includes('add')) && (opts.includes('-g') || opts.includes('global'))) {
+               
+                    if (["install", "add"].includes(opts[0]) && (["-g", "global"].includes(opts[1]) || ["-g", "global"].includes(opts[2]))) {
+                 
                         let child = spawn(`${tool}`, opts, {
                             stdio: ['pipe', 'pipe', process.stderr],
                             shell: true
@@ -49,6 +50,7 @@ export async function commands(keys: any[]) {
 
                         child.on('error', (error: any) => {
                             process.stdout.write(error);
+                            process.exit(0);
                         });
 
                         child.on('close', (code) => {
@@ -70,6 +72,7 @@ export async function commands(keys: any[]) {
 
                         child.on('error', (error: any) => {
                             process.stdout.write(error);
+                            process.exit(0);
                         });
 
                         child.on('close', (code) => {

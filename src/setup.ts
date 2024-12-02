@@ -1,10 +1,10 @@
 import * as fs from 'fs';
-import { execFileSync } from 'child_process';
+import { exec, execFileSync } from 'child_process';
 import { DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_SETTING_FILE, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, DIR_PATH_HOME_FOLDER } from './common';
 import path from 'path';
-import { setupFolderDotNVersion, updateFileDotNRC, updateNodeVersion } from './update';
+import { installNode, setupFolderDotNVersion, updateFileDotNRC } from './update';
 import { spawn } from 'child_process';
-const version = "v18.20.5"
+const version = "v20.18.1"
 
 export function setup() {
     return new Promise(async (res, rej) => {
@@ -17,7 +17,7 @@ export function setup() {
             }
             fs.writeFileSync(DIR_PATH_HOME_DOT_N_SETTING_FILE, JSON.stringify(setting, null, "\t"));
             await updateFileDotNRC(version)
-            await setupBin()
+
             execFileSync('setx', ['N_HOME', `"${DIR_PATH_HOME_DOT_N_FOLDER}"`], {
                 stdio: ['pipe', 'pipe', process.stderr],
                 encoding: 'utf8',
@@ -44,18 +44,45 @@ export function setup() {
                 if (pathArr.length > 1) {
                     let val = await setNodeSymLink(pathArr[0])
                     if (val) {
-                        res(true)
+                        let checkNode = await updateNode()
+                        if (checkNode) {
+                            res(true)
+                        } else {
+                            let nv = await installNode(version)
+                            if (nv) {
+                                await setupBin()
+                                res(true)
+                            }
+                        }
                     }
                 } else {
                     let val = await setNodeSymLink(pathArr[0])
                     if (val) {
-                        res(true)
+                        let checkNode = await updateNode()
+                        if (checkNode) {
+                            res(true)
+                        } else {
+                            let nv = await installNode(version)
+                            if (nv) {
+                                await setupBin()
+                                res(true)
+                            }
+                        }
                     }
                 }
 
                 let val = await setNodeSymLink(pathNodeArr[0])
                 if (val) {
-                    res(true)
+                    let checkNode = await updateNode()
+                    if (checkNode) {
+                        res(true)
+                    } else {
+                        let nv = await installNode(version)
+                        if (nv) {
+                            await setupBin()
+                            res(true)
+                        }
+                    }
                 }
             } else if (pathNodeArr.length === 1) {
                 let val = await setNodeSymLink(pathNodeArr[0])
@@ -63,10 +90,11 @@ export function setup() {
                     res(true)
                 }
             } else {
-                let nv = await updateNodeVersion(version)
+                let nv = await installNode(version)
                 if (nv) {
                     let val = await setNodeSymLink(`${path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, version)}`)
                     if (val) {
+                        await setupBin()
                         res(true)
                     }
                 }
@@ -79,10 +107,22 @@ export function setup() {
 
 }
 
+function updateNode() {
+    return new Promise((res, rej) => {
+        const folders = fs.readdirSync(DIR_PATH_HOME_DOT_N_VERSION_FOLDER);
+
+        if (folders.length > 0) {
+            res(true)
+        } else {
+            res(false)
+        }
+    })
+}
+
 function setupBin() {
     return new Promise(async (res, rej) => {
 
-        const child = spawn(`winget`, ['install','DenoLand.Deno'], {
+        const child = spawn(`winget`, ['install', 'DenoLand.Deno'], {
             stdio: ['pipe', 'pipe', process.stderr],
             shell: true
         });
@@ -96,41 +136,8 @@ function setupBin() {
         });
 
         child.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
             process.exit(0);
         });
-
-        // const nenoVersion = 'v2.1.2'
-        // const name = 'bin'
-        // const url = `${DENO_DOWNLOAD_MIRROR_URI}/${nenoVersion}/deno-x86_64-pc-windows-msvc.zip`
-        // const filePath = path.basename(url);
-        // const outputDir = path.join(DIR_PATH_HOME_DOT_N_FOLDER, name);
-        // const outputDownloadDir = path.join(DIR_PATH_HOME_DOT_N_FOLDER, filePath);
-        // let statusOutputDir = await validateDirVersion(outputDir)
-        // if (!statusOutputDir) {
-        //     // let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_FOLDER, name, 'Bin')
-        //     // if (download) {
-        //     //     res(true)
-        //     // }
-
-        //     const child = spawn(`curl`, ['-L','-o', `${filePath}`, `${url}`], {
-        //         stdio: ['pipe', 'pipe', process.stderr],
-        //         shell: true
-        //     });
-
-        //     child.stdout.on('data', (data) => {
-        //         process.stdout.write(data);
-        //     });
-
-        //     child.on('error', (error: any) => {
-        //         process.stdout.write(error);
-        //     });
-
-        //     child.on('close', (code) => {
-        //         console.log(`child process exited with code ${code}`);
-        //         process.exit(0);
-        //     });
-        // }
 
     })
 
@@ -160,16 +167,30 @@ function setupFolderDotN() {
 
 }
 
+const batchScript = `
+@echo off
+for /f "skip=2 tokens=2,*" %%A in ('reg query "HKLM\\System\\CurrentControlSet\\Control\\Session Manager\\Environment" /v Path 2^>nul') do (
+  setx PATH "%%B;%%N_HOME%%;%%N_SYMLINK%%"
+)
+@echo on
+`;
+
 function setupEnv() {
     return new Promise(async (res, rej) => {
-        const sourceFolder = path.join(__dirname, '../', 'setup.cmd');
-        execFileSync(`${sourceFolder}`, {
-            stdio: ['pipe', 'pipe', process.stderr],
-            encoding: 'utf8',
-            shell: true
+        exec(batchScript, (error, stdout, stderr) => {
+            if (error) {
+                process.stdout.write(stderr);
+                return;
+            }
+            if (stderr) {
+                process.stdout.write(stderr);
+                return;
+            }
+            process.stdout.write(stdout);
+            res(true)
         });
 
-        res(true)
+
     })
 
 }

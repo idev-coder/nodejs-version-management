@@ -1,6 +1,6 @@
 {
   "name": "@idev-coder/n",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "main": "lib/cli.js",
   "homepage": "https://idev-coder.github.io/nodejs-version-management/",
   "bugs": {
@@ -41,9 +41,7 @@
   },
   "files": [
     "bin",
-    "commands",
-    "lib",
-    "setup.cmd"
+    "lib"
   ],
   "author": "Natthapat Piasangka <n.devs260340@gmail.com>",
   "license": "MIT",

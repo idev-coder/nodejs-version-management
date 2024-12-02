@@ -4,14 +4,27 @@ import * as os from 'os';
 import { downloadAndUnzip } from './download';
 import { arch, DIR_PATH_HOME_DOT_N_DOT_NRC_FILE, DIR_PATH_HOME_DOT_N_FOLDER, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, NODE_DOWNLOAD_MIRROR_URI, platform } from './common';
 
+export function installNode(version: string) {
+  return new Promise(async (res, rej) => {
+    const url = `${NODE_DOWNLOAD_MIRROR_URI}/release/${version}/node-${version}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`
+    const filePath = path.basename(url);
+    const outputDownloadDir = path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, filePath);
+    updateFileDotNRC(version)
+    let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, version, 'NodeJs')
+    if (download) {
+
+      let updatePkg = await updateEnvironmentVariables(version)
+      if (updatePkg) {
+        res(true)
+      }
+
+    }
+  })
+
+}
 export function updateNodeVersion(name: string) {
   return new Promise(async (res, rej) => {
-    const url = `${NODE_DOWNLOAD_MIRROR_URI}/release/${name}/node-${name}-${platform}-${arch}.${os.platform() === "win32" ? "zip" : "tar.xz"}`
-    const filePath = path.basename(url);
-
     const outputDir = path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name);
-    const outputDownloadDir = path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, filePath);
-
 
     let statusDirVersion = await validateDirVersion(DIR_PATH_HOME_DOT_N_VERSION_FOLDER)
     if (statusDirVersion) {
@@ -23,15 +36,9 @@ export function updateNodeVersion(name: string) {
           res(true)
         }
       } else {
-        updateFileDotNRC(name)
-        let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name, 'NodeJs')
-        if (download) {
-
-          let updatePkg = await updateEnvironmentVariables(name)
-          if (updatePkg) {
-            res(true)
-          }
-
+        let install = await installNode(name)
+        if (install) {
+          res(true)
         }
 
       }
@@ -42,20 +49,10 @@ export function updateNodeVersion(name: string) {
 
       if (status && folderDotNVersion) {
 
-        updateFileDotNRC(name)
-        let download = await downloadAndUnzip(url, outputDownloadDir, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, name, 'NodeJs')
-        if (download) {
-
-          let setup = await updateEnvironmentVariables(name)
-          if (setup) {
-            // process.stdout.write('Done!\n');
-            // process.exit(0);
-            res(true)
-          }
-
-
+        let install = await installNode(name)
+        if (install) {
+          res(true)
         }
-
 
       }
     }

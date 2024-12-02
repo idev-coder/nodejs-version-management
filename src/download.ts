@@ -6,7 +6,8 @@ import { arch, DIR_PATH_HOME_DOT_N_VERSION_FOLDER, platform } from './common';
 import { execFileSync } from 'child_process';
 import { updateEnvironmentVariables } from './update';
 import { loading } from 'cli-loading-animation'
-
+import readline from 'readline'
+import binScripts from './bin-scripts';
 
 
 // ฟังก์ชันสำหรับดาวน์โหลดไฟล์พร้อมแสดงเปอร์เซ็นต์การโหลด
@@ -75,22 +76,14 @@ async function tryRename(oldPath: string, newPath: string) {
 
 async function trySetup(version: string) {
     return new Promise((res, rej) => {
-        const sourceFolder = path.join(__dirname, '../', 'commands');
         const destinationFolder = path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, version)
         let results: any[] = [];
 
         // อ่านไฟล์ในโฟลเดอร์ต้นทาง
-        const files = fs.readdirSync(sourceFolder);
-        files.forEach(file => {
-            const sourceFile = path.join(sourceFolder, file);
-            const destFile = path.join(destinationFolder, file);
-            const stats = fs.statSync(sourceFile);
-            if (!stats.isDirectory()) {
-
-                const data = fs.readFileSync(sourceFile, 'utf8');
-                results.push(data);
-                fs.writeFileSync(destFile, data)
-            }
+        binScripts.forEach(file => {
+            const destFile = path.join(destinationFolder, file.name);
+            results.push(destFile)
+            fs.writeFileSync(destFile, file.script)
         })
 
         res(results)
@@ -102,7 +95,11 @@ async function trySetup(version: string) {
 }
 
 async function tryInstall(path: string): Promise<boolean | any> {
-    process.stdout.write("[..] Install Package");
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      process.stdout.write("[..] Install Package\n")
     return new Promise((res, rej) => {
         const npmInit = execFileSync('npm', ['init', '-y'], {
             cwd: path,
@@ -121,8 +118,10 @@ async function tryInstall(path: string): Promise<boolean | any> {
 
         if (npmInit && npmInstall) {
             res(true)
+            readline.moveCursor(process.stdout, 0, -1)
+            readline.clearLine(process.stdout, 0);  // 0 หมายถึงเคลียร์บรรทัดปัจจุบัน
             process.stdout.write("[✓] Install Package\n");
-
+            rl.close()
         }
     })
 

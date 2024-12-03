@@ -77,125 +77,105 @@ export async function commands() {
                 if (cmdArr[0] === 'yarn') {
                     if (cmdArr[1].includes('global')) {
                         let version: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
-                        exec(cmd.value, (error, stdout, stderr) => {
-                            if (error) {
-                                console.error(error);
-                                return;
-                            }
+                    
 
-                            if (stdout) {
-                                console.log(stdout);
-                                updateEnvironmentVariables(version)
-                                return;
-                            }
-
-                            if (stderr) {
-                                console.error(stderr);
-                                return;
-                            }
+                        const child = spawn(`${cmd.value.split(" ").slice(0)[0]}`,cmd.value.split(" ").slice(1), {
+                            stdio: ['pipe', 'pipe', process.stderr],
+                            shell: true
+                        });
+                
+                        child.stdout.on('data', (data) => {
+                            process.stdout.write(data);
+                            updateEnvironmentVariables(version)
+                        });
+                
+                        child.on('error', (error: any) => {
+                            process.stdout.write(error);
+                        });
+                
+                        child.on('close', (code) => {
+                            process.exit(0);
                         });
                     } else {
-                        exec(cmd.value, (error, stdout, stderr) => {
-                            if (error) {
-                                console.error(error);
-                                return;
-                            }
-
-                            if (stdout) {
-                                console.log(stdout);
-                                return;
-                            }
-
-                            if (stderr) {
-                                console.error(stderr);
-                                return;
-                            }
+                        const child = spawn(`${cmd.value.split(" ").slice(0)[0]}`,cmd.value.split(" ").slice(1), {
+                            stdio: ['pipe', 'pipe', process.stderr],
+                            shell: true
+                        });
+                
+                        child.stdout.on('data', (data) => {
+                            process.stdout.write(data);
+                        });
+                
+                        child.on('error', (error: any) => {
+                            process.stdout.write(error);
+                        });
+                
+                        child.on('close', (code) => {
+                            process.exit(0);
                         });
                     }
                 } else {
                     if (cmdArr.length > 2 && cmdArr[2].includes('-g')) {
                         let version: any = fs.readFileSync(DIR_PATH_HOME_DOT_N_DOT_NRC_FILE)
-                        exec(cmd.value, (error, stdout, stderr) => {
-                            if (error) {
-                                console.error(error);
-                                return;
-                            }
+                      
 
-                            if (stdout) {
-                                console.log(stdout);
-                                updateEnvironmentVariables(version)
-                                return;
-                            }
-
-                            if (stderr) {
-                                console.error(stderr);
-                                return;
-                            }
-                        });
-                    } else {
-                        // console.log(cmd.value);
-
-
-                        // exec(cmd.value, (error, stdout, stderr) => {
-                        //     if (error) {
-                        //         console.error(error);
-                        //         return;
-                        //     }
-
-                        //     if (stdout) {
-                        //         console.log(stdout);
-                        //         return;
-                        //     }
-
-                        //     if (stderr) {
-                        //         console.error(stderr);
-                        //         return;
-                        //     }
-                        // });
-
-                        // cmd.value.split(" ").slice(0)
-
-                        const cmdd = spawn(`${cmd.value.split(" ").slice(0)[0]}`,cmd.value.split(" ").slice(1), {
+                        const child = spawn(`${cmd.value.split(" ").slice(0)[0]}`,cmd.value.split(" ").slice(1), {
                             stdio: ['pipe', 'pipe', process.stderr],
                             shell: true
                         });
+                
+                        child.stdout.on('data', (data) => {
+                            process.stdout.write(data);
+                            updateEnvironmentVariables(version)
+                        });
+                
+                        child.on('error', (error: any) => {
+                            process.stdout.write(error);
+                        });
+                
+                        child.on('close', (code) => {
+                            process.exit(0);
+                        });
+                    } else {
 
                         // ฟังก์ชันที่รับข้อมูลจากผู้ใช้และส่งให้กับ child process
                       
                         // รับผลลัพธ์จาก stdout ของ child process
-                        cmdd.stdout.on('data', (data) => {
-                            console.log(`Child Process Output: ${data}`);
-                            cmdd.stdin.write(data)
+                        const child = spawn(`${cmd.value.split(" ").slice(0)[0]}`,cmd.value.split(" ").slice(1), {
+                            stdio: ['pipe', 'pipe', process.stderr],
+                            shell: true
                         });
-
-                       
-
-                    
-
-                        // เมื่อ child process ปิด
-                        cmdd.on('close', (code) => {
-                            console.log(`Child process exited with code ${code}`);
-                            rl.close();
+                
+                        child.stdout.on('data', (data) => {
+                            process.stdout.write(data);
+                        });
+                
+                        child.on('error', (error: any) => {
+                            process.stdout.write(error);
+                        });
+                
+                        child.on('close', (code) => {
+                            process.exit(0);
                         });
 
                     }
                 }
             } else {
-                exec(cmd.value, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(error);
-                        return;
-                    }
-
-                    if (stdout) {
-                        console.log(stdout);
-                        return;
-                    }
-
-                    if (stderr) {
-                        console.error(stderr);
-                        return;
-                    }
+                const child = spawn(`${cmd.value.split(" ").slice(0)[0]}`,cmd.value.split(" ").slice(1), {
+                    stdio: ['pipe', 'pipe', process.stderr],
+                    shell: true
+                });
+        
+                child.stdout.on('data', (data) => {
+                    process.stdout.write(data);
+                });
+        
+                child.on('error', (error: any) => {
+                    process.stdout.write(error);
+                });
+        
+                child.on('close', (code) => {
+                    process.exit(0);
                 });
             }
             // process.stdout.write(cmd.value);

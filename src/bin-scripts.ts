@@ -1,4 +1,4 @@
-function shScript(name: string, pathName: string): any {
+export function shScript(name: string, pathName: string): any {
     const data: any = {}
     data.name = name
     data.script = `
@@ -18,7 +18,7 @@ exec "$basedir/node_modules/${pathName}"   "$@"
     return data
 }
 
-function cmdScript(name: string, pathName: string) {
+export function cmdScript(name: string, pathName: string) {
     const data: any = {}
     data.name = name
     data.script = `
@@ -43,7 +43,7 @@ endLocal & goto #_undefined_# 2>NUL || title %COMSPEC% & "%_prog%"  "%dp0%\\node
     return data
 }
 
-function ps1Script(name: string, pathName: string) {
+export function ps1Script(name: string, pathName: string) {
     const data: any = {}
     data.name = name
     data.script = `
@@ -79,7 +79,7 @@ exit $ret
     return data
 }
 
-const binPaths = [
+export const binPaths = [
     {
         path: "bun/bin/bun.exe",
         files: [

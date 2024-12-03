@@ -13,11 +13,11 @@ export const MSG_REMOVE_NODE_VERSION_FAILED: any = (version:string) => `remove n
 export const platform: string = os.platform() === "win32" ? "win" : os.platform();
 export const arch: string = os.arch();
 export const VERSION: string = pkg.version
-export const DIR_PATH_PROJECT: string = projectPathFile("")
-export const DIR_PATH_PROJECT_DOT_NRC_FILE: string = projectPathFile(".nrc")
-export const DIR_PATH_PROJECT_DOT_NVMRC_FILE: string = projectPathFile(".nvmrc")
-export const DIR_PATH_PROJECT_DOT_NODE_VERSION_FILE: string = projectPathFile(".node-version")
-export const DIR_PATH_PROJECT_PACKAGE_JSON_FILE: string = projectPathFile("package.json")
+export const DIR_PATH_PROJECT: string | any = projectPathFile("")
+export const DIR_PATH_PROJECT_DOT_NRC_FILE: string | any = projectPathFile(".nrc")
+export const DIR_PATH_PROJECT_DOT_NVMRC_FILE: string | any = projectPathFile(".nvmrc")
+export const DIR_PATH_PROJECT_DOT_NODE_VERSION_FILE: string | any = projectPathFile(".node-version")
+export const DIR_PATH_PROJECT_PACKAGE_JSON_FILE: string | any = projectPathFile("package.json")
 export const DIR_PATH_HOME_FOLDER: string = os.homedir()
 export const DIR_PATH_HOME_DOT_N_FOLDER: string = path.join(DIR_PATH_HOME_FOLDER, '.n');
 export const DIR_PATH_HOME_DOT_N_VERSION_FOLDER: string = path.join(DIR_PATH_HOME_DOT_N_FOLDER, 'node_versions');

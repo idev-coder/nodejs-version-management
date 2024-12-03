@@ -29,7 +29,7 @@ export async function nodeOnlineVersion(name?: string | null | undefined) {
                 let strToArr = newName.split("")
 
                 if (numberRegex.test(strToArr[0]) || (strToArr[0].includes("v") && numberRegex.test(strToArr[1]))) {
-                    
+
                     if (strToArr[0].includes("v")) {
                         let dataVersions = listVersion.filter((val: NodeVersionType) => val.version.includes(newName))
 
@@ -83,7 +83,7 @@ export async function nodeOnlineVersion(name?: string | null | undefined) {
                     }
 
                 } else {
-                   
+
                     return {
                         message: MSG_NODE_NOT_VERSION_TYPE,
                         data: []
@@ -121,10 +121,41 @@ export async function nodeLocalVersion(name?: string | null | undefined) {
 
 
         if (name) {
-            return versions.find((val: string) => val === name)
+            let fVersion = versions.filter((val: string) => {
+                let getVersionArr = name.split('.')
+                let baseVersionArr = val.split('.')
+                if (getVersionArr.length === 1) {
+
+                    if (baseVersionArr[0].includes(getVersionArr[0])) {
+                        return val
+                    }
+                } else if (getVersionArr.length === 2) {
+
+                    if (baseVersionArr[0].includes(getVersionArr[0])) {
+                        if (baseVersionArr[1].includes(getVersionArr[1])) {
+                            return val
+                        }
+                    }
+                } else if (getVersionArr.length === 3) {
+
+                    if (baseVersionArr[0].includes(getVersionArr[0])) {
+                        if (baseVersionArr[1].includes(getVersionArr[1])) {
+                            if (baseVersionArr[2].includes(getVersionArr[2])) {
+                                return val
+                            }
+                        }
+                    }
+                }
+
+            })
+
+            if (fVersion.length > 0) {
+
+                return fVersion[fVersion.length - 1]
+            }
         } else {
             let arrToStr: any = versions.toString()
-            return arrToStr.replaceAll(',', "\n")
+            return arrToStr.split(",").join("\n")
 
         }
     } catch (err: any) {

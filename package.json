@@ -1,6 +1,6 @@
 {
   "name": "@idev-coder/n",
-  "version": "4.0.7",
+  "version": "4.0.8",
   "main": "lib/cli.js",
   "homepage": "https://idev-coder.github.io/nodejs-version-management/",
   "bugs": {
@@ -20,6 +20,9 @@
     "build": "tsc",
     "dev": "ts-node ./src/cli.ts",
     "build:pkg:setup": "pkg -t node18-win bin/n-cli.cjs -o build/Setup.exe"
+  },
+  "engines": {
+    "node":"v18"
   },
   "preferGlobal": true,
   "keywords": [

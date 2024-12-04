@@ -11,40 +11,6 @@ import readline from 'readline';
 import { engineStatus } from './engine-stataus';
 import { nodeLocalVersion } from './node-version';
 
-// export function cmdScript(pathEngine: string, pathTool: string, options: string) {
-
-//     return `
-// @ECHO off
-// GOTO start
-// :find_dp0
-// SET dp0=%~dp0
-// EXIT /b
-// :start
-// SETLOCAL
-// CALL :find_dp0
-
-// IF EXIST "${pathEngine}\\node.exe" (
-//   SET "_prog=${pathEngine}\\node.exe"
-// ) ELSE (
-//   SET "_prog=node"
-//   SET PATHEXT=%PATHEXT:;.JS;=;%
-// )
-
-// endLocal & goto #_undefined_# 2>NUL || title %COMSPEC% & "%_prog%"  "${pathEngine}\\node_modules\\${pathTool}" ${options}
-//     `
-// }
-
-// const binPath: any = {
-//     npm: 'npm\\bin\\npm-cli.js',
-//     npx: 'npm\\bin\\npx-cli.js',
-//     yarn: 'yarn\\bin\\yarn.js',
-//     yarnpkg: 'yarn\\bin\\yarn.js',
-//     pnpm: 'pnpm\\bin\\pnpm.cjs',
-//     pnpx: 'pnpm\\bin\\pnpx.cjs',
-//     bun: 'bun\\bin\\bun.exe',
-//     bunx: 'bun\\bin\\bun.exe'
-
-// }
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -63,13 +29,9 @@ export async function commands() {
         let engine = engines.find((val: any) => val.type === 'engine')
         let tool = engines.find((val: any) => val.type === 'tool')
 
-        // let localVersion: any = await nodeLocalVersion(engine.value)
 
         const cmd: any = await options(opts)
         let [key, ...keys] = cmd.value.split(' ')
-
-        // let code = cmdScript(path.join(DIR_PATH_HOME_DOT_N_VERSION_FOLDER, engine.value).replace(/\//g, '\\\\'), binPath[key], keys.toString().split(",").join(" "))
-
 
         if (cmd.type === 'script') {
             let cmdArr = cmd.value.split(" ")
@@ -182,8 +144,8 @@ export async function commands() {
             // process.exit(0);
 
         } else {
-            // process.stdout.write(cmd.value);
-            // process.exit(0);
+            process.stdout.write(cmd.value);
+            process.exit(0);
         }
     } else {
         const folders = fs.readdirSync(DIR_PATH_HOME_FOLDER);
